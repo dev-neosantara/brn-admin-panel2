@@ -1,6 +1,7 @@
 <?= $this->extend('App\Views\template') ?>
 <?= $this->section('head') ?>
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+<!-- <link rel="stylesheet" href="<?= ROOTPATH.'node_modules/dropzone.css' ?>"> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
@@ -12,7 +13,6 @@
         <h6 class="m-0 font-weight-bold text-primary">Tambah User</h6>
     </div>
     <div class="card-body">
-
         <div class="container">
             <form id="formuser" action="#" method="post">
                 <div class="row border-b mb-4 pb-4">
@@ -78,11 +78,11 @@
                                     <input type="text" class="form-control form-control-user" id="year" tabindex="0" name="year" value="<?php echo isset($data) && property_exists($data, 'year_approved') ? $data->year_approved : '' ?>">
                                 </div>
                             </div>
-                            <?php if (isset($data_id)) { ?>
+                            <!-- <?php //if (isset($data_id)) { ?>
                                 <div class="col-md-4 col-sm-12">
-                                    <?= view_cell("\Olshop\Controllers\Product::listimage", ['data_id' => $data_id]) ?>
+                                    <?php //view_cell("\Olshop\Controllers\Product::listimage", ['data_id' => $data_id]) ?>
                                 </div>
-                            <?php } ?>
+                            <?php //} ?> -->
                             <!-- <div class="col-md-4 col-sm-12">
                             <label for="">Foto Profile</label>
                             <form action="https://api.brnjuara.com/api/upload-files" method="post" class="dropzone" id="pdimg"> -->
