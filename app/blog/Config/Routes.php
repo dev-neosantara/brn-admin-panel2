@@ -37,7 +37,8 @@ $routes->group('blog', ['namespace' => 'Blog\Controllers'], function ($routes) {
     $routes->get('articles/list', 'Article::listajax', ['as' => 'list_article_ajax']);
     $routes->get('articles/add', 'Article::form', ['as' => 'add_article']);
     $routes->get('articles/edit/(:num)', 'Article::form/$1', ['as' => 'edit_article']);
-    $routes->get('articles/publish/(:num)', 'Article::publish/$1', ['as' => 'publish_article']);
+    $routes->get('article/publish/(:num)', 'Article::publish/$1', ['as' => 'publish_article']);
+    $routes->get('articles/delete/(:num)', 'Article::deletearticle/$1', ['as' => 'delete_article']);
     $routes->post('category/add', 'Article::categoryinsert');
     $routes->get('category/add', 'Article::categoryadd', ['as' => 'add_category']);
     $routes->get('category/edit/(:num)', 'Article::categoryadd/$1', ['as' => 'edit_category']);

@@ -49,6 +49,14 @@ $routes->group('sponsors', ['namespace' => 'Brn\Controllers'], function ($routes
     $routes->get('hapus/(:num)', 'SponsorsController::delete/$1');
     $routes->post('insert', 'SponsorsController::insert', ['as' => 'insert_sponsor']);
 });
+$routes->group('events', ['namespace' => 'Brn\Controllers'], function ($routes) {
+    $routes->get('/', 'EventsController::index');
+    $routes->get('list', 'EventsController::listajax', ['as' => 'list_event_ajax']);
+    $routes->get('add', 'EventsController::form', ['as' => 'add_event']);
+    $routes->get('edit/(:num)', 'EventsController::form/$1');
+    $routes->get('hapus/(:num)', 'EventsController::delete/$1');
+    $routes->post('insert', 'EventsController::insert', ['as' => 'insert_event']);
+});
 
 /*
  * --------------------------------------------------------------------

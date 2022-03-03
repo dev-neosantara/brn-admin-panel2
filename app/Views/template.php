@@ -96,13 +96,16 @@
     <script src="<?= base_url() ?>/lib/jquery/jquery.min.js"></script>
     <!-- <script src="<?= base_url() ?>/lib/bootstrap/js/bootstrap.bundle.min.js"></script> -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    <!-- <script src="<?= base_url().'node_modules/bootstrap/dist/js/bootstrap.min.js' ?>"></script> -->
     <!-- Core plugin JavaScript-->
     <script src="<?= base_url() ?>/lib/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
     <script src="<?= base_url() ?>/js/sb-admin-2.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <script src="<?= base_url().'/node_modules/sweetalert2/sweetalert2.all.min.js' ?>"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- <script src="<?= base_url().'/node_modules/axios/dist/axios.min.js' ?>"></script> -->
 
     <script>
         const Toast = Swal.mixin({

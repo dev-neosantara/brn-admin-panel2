@@ -8,7 +8,7 @@
 
 <?= $this->section('content') ?>
 <!-- Page Heading -->
-<!-- <h1 class="h3 mb-2 text-gray-800">Data Produk</h1> -->
+<!-- <h1 class="h3 mb-2 text-gray-800">Data artikel</h1> -->
 <!-- <p class="mb-4">DataTables is a third party plugin that is used to generate the demo table below.
                         For more information about DataTables, please visit the <a target="_blank"
                             href="https://datatables.net">official DataTables documentation</a>.</p> -->
@@ -74,22 +74,21 @@
                     targets: 4,
                     render: function(data, type, full, meta) {
                         
-                        let pubclass = full[3] == 1 ? "btn-danger" : "btn-success";
-                        let pubmsg = full[3] == 1 ? "Unpublish" : "Publish";
-                        let pubicon = full[3] == 1 ? "fa-chevron-down" : "fa-chevron-up";
+                        let pubclass = full[3] == "PUBLISHED" ? "bg-red-400" : "bg-green-400";
+                        let pubicon = full[3] == "PUBLISHED" ? `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>` : `<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+                        let pubmsg = full[3] == "PUBLISHED" ? "Unpublish" : "Publish";
                         if (type === 'display') {
-                            data = `<a title="Edit artikel ini" class="btn btn-primary" href="<?= base_url('blog/articles/edit') ?>/` + data + `">
-                                    <i class="fas fa-pencil-alt"></i>
+                            data = `<div class="flex-col space-y-2"><a title="Edit artikel ini" class="text-white flex items-center justify-center space-x-4 px-2 py-1 rounded-lg bg-green-400" href="<?= base_url('blog/articles/edit') ?>/` + data + `">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg> <span>Edit</span>
                                 <span></span>
                             </a>
-                            <a title="Hapus produk ini" class="btn btn-danger" href="#" onclick="deletepro('` + full[1] + `', ` + full[5] + `)">
-                                    <i class="fas fa-trash"></i>
-                                <span></span>
+                            <a title="Hapus artikel ini" class="text-white flex items-center justify-center space-x-4 px-2 py-1 rounded-lg bg-red-400" href="#" onclick="deletepro('` + full[1] + `', ` + full[4] + `)">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg><span>Hapus</span>
                             </a>
-                            <a title="Unpublished produk ini" class="btn `+ pubclass +`" href="#" onclick="publish('` + full[1] + `', ` + full[5] + `)">
-                                    <i class="fas `+ pubicon +`"></i>
+                            <a title="${pubmsg} artikel ini" class="text-white flex items-center justify-center space-x-4 px-2 py-1 rounded-lg `+ pubclass +`" href="#" onclick="publish('` + full[1] + `', ` + full[4] + `, '${pubmsg}')">
+                                    ${pubicon}
                                 <span>`+ pubmsg +`</span>
-                            </a>`
+                            </a></div>`
                         }
                         return data;
                     }
@@ -112,10 +111,10 @@
     }
 
     function publish(name, id, extra = 'Publish') {
-        const url = "<?= base_url('blog/articles/publish') ?>/" + id;
+        const url = "<?= base_url('blog/article/publish') ?>/" + id;
         Swal.fire({
             title: 'Apa anda yakin?',
-            text: "Anda akan mem"+extra+" artikel ini?",
+            text: "Anda akan mem "+extra+" artikel " + name,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
@@ -147,11 +146,11 @@
             }
         })
     }
-    function deletepro(id) {
+    function deletepro(name, id) {
         const url = "<?= base_url('blog/articles/delete') ?>/" + id;
         Swal.fire({
             title: 'Apa anda yakin?',
-            text: "Anda akan menghapus artikel ini? ",
+            text: "Anda akan menghapus artikel " + name,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',

@@ -1,0 +1,31 @@
+{
+  "name": "brn-admin",
+  "version": "1.0.0",
+  "description": "## What is CodeIgniter?",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dev-neosantara/brn-admin-panel2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dev-neosantara/brn-admin-panel2/issues"
+  },
+  "homepage": "https://github.com/dev-neosantara/brn-admin-panel2#readme",
+  "dependencies": {
+    "axios": "^0.26.0",
+    "bootstrap": "^4.*",
+    "cleave.js": "^1.6.0",
+    "dropzone": "^6.0.0-beta.2",
+    "flatpickr": "^4.6.9",
+    "select2": "^4.1.0-rc.0",
+    "sweetalert2": "^11.4.4"
+  }
+}

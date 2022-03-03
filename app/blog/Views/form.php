@@ -25,12 +25,12 @@
             <div class="row mb-4 pr-2">
                 <?php if (isset($data_id) && $data->image != null && $data->image != "") { ?>
                     <div class="col-md-12">
-                        <img src="<?= base_url('uploads/article/'.$data->image) ?>" alt="gambar cover">
+                        <img src="<?= base_url($data->image) ?>" alt="gambar cover">
                     </div>
                 <?php } ?>
                 <div class="col-md-12">
                     <label for="">Foto Cover</label>
-                    <form action="<?php echo (isset($data_id)) ? base_url('/blog/articles/update') : base_url('/blog/articles/insert') ?>" method="post" class="dropzone" id="pdimg">
+                    <form action="<?= base_url('/blog/article/insert') ?>" method="post" class="dropzone" id="pdimg">
                         <!-- <div id="pdimg"></div> -->
                         <div class="dz-message" data-dz-message><span>Klik atau jatuhkan file foto Artikel disini!</span></div>
                     </form>
@@ -64,30 +64,73 @@
 <script>
     var contentdata = "";
     Dropzone.autoDiscover = false;
+    var image = "";
+
+    function sendapi() {
+        Toast.fire({
+            icon: 'info',
+            title: "menyimpan ke database!"
+        });
+        var params = {
+            title: $('#title').val(),
+            content: contentdata.getEditor().getData(),
+            category: 0,
+            status: $('#is_published').val() == 'on' ? "published" : "draft",
+            image: image,
+            data_id: null
+        };
+        <?php if(isset($data_id) && $data_id != null){ ?>
+            params['data_id'] = <?= $data_id ?>;
+            <?php } ?>
+        // console.log(params);return;
+        var urls = "<?= base_url('sponsors/insert') ?>";
+        axios.post(urls, params)
+            .then(function(response) {
+                if (response.data.error == 0) {
+                    successins(true, response.data.message);
+                } else {
+
+                    successins(false, response.data.message);
+                }
+
+            })
+            .catch(function(error) {
+                image = images;
+                console.log(error);
+                successins(false, error);
+            });
+    }
+
     var ds = $("#pdimg").dropzone({
         paramName: "pd_img", // The name that will be used to transfer the file
         maxFilesize: 10, // MB
         autoProcessQueue: false,
-        multiple: true,
+        multiple: false,
         accept: function(file, done) {
             if (done) {
                 done();
             }
         },
-        successmultiple: function() {
-            successins(true)
+        success: function(response) {
+            console.log(response);
+            image = response.data.file_paths[0];
+            sendapi();
         },
-        errormultiple: function() {
-            successins(false)
-        },
-        sending: function(file, xhr, formData) {
-            formData.append('title', $('#title').val());
-            formData.append('content', contentdata);
-            formData.append('category', 0); //edit nanti
-            formData.append('status', $('#is_published').val() == 'on' ? "published" : "draft");
-            <?php if (isset($data_id)) { ?>
-                formData.append('data_id', <?= $data_id ?>)
-            <?php } ?>
+        error: function() {
+            // successins(false)
+            Swal.fire({
+                title: 'Gagal mengupload gambar cover',
+                text: "Gagal mengupload gambar cover, tetap simpan data?",
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Ya! simpan data tanpa gambar cover',
+                cancelButtonText: "Tidak!"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    sendapi()
+                }
+            });
         }
     });
 
@@ -143,6 +186,7 @@
             dzone.processQueue();
         } else {
             dzone.uploadFiles([]); //send empty 
+            sendapi();
         }
     }
 </script>
