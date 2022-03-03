@@ -16,6 +16,14 @@ class Extra extends ResourceController
         $this->db = \Config\Database::connect();
     }
 
+    public function uploaderext($id = 'files', $url = 'https://api.brnjuara.com/api/upload-files', $text = 'Jatuhkan file disini!')
+    {
+        $db      = \Config\Database::connect();
+        return view('App\Views\components\uploaderext', array(
+            'id' => $id, $url => $url, $text => $text
+        ));
+    }
+
     public function get_regions($is_registered = false)
     {
         // print_r($this->request->getVar());exit;

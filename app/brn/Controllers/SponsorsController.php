@@ -35,9 +35,9 @@ class SponsorsController extends \App\Controllers\BaseAdmin
     {
         $db = \Config\Database::connect();
 
-        $builder = $db->table('sponsors as per')->select('per.name, per.nik, per.profile_photo_path, users.email as email, per.id')->join('users', 'per.created_by_id = users.id', 'left');
+        $builder = $db->table('sponsors as sp')->select('sp.title, sp.image as logo, sp.website, sp.poin, sp.id');
         return DataTable::of($builder)
-            ->setSearchableColumns(['per.name', 'per.nik', 'users.email'])
+            ->setSearchableColumns(['sp.title', 'sp.website', 'sp.phone_number', 'sp.description'])
             ->addNumbering() //it will return data output with numbering on first column
             ->toJson();
     }
@@ -59,7 +59,7 @@ class SponsorsController extends \App\Controllers\BaseAdmin
     }
     
 
-    public function insertsponsors()
+    public function insert()
     {
         // goto model
         $db      = \Config\Database::connect();
@@ -68,25 +68,21 @@ class SponsorsController extends \App\Controllers\BaseAdmin
             $builder = $db->table('sponsors');
             if($this->request->getVar('data_id') != null){
                 $builder->set(array(
-                    'name' => $this->request->getVar('name'),
-                    'address' => $this->request->getVar('address'),
-                    'nik' => $this->request->getVar('nik'),
-                    'case_report_id' => $this->request->getVar('case_report_id'),
+                    'title' => $this->request->getVar('title'),
+                    'description' => $this->request->getVar('description'),
                     'phone_number' => $this->request->getVar('phone_number'),
-                    'profile_photo_path' => $this->request->getVar('profil_photo_path'),
-                    'chronology' => $this->request->getVar('chronology'),
-                    'birth_date' => $this->request->getVar('birth_date'),
+                    'website' => $this->request->getVar('website'),
+                    'email' => $this->request->getVar('email'),
+                    'image' => $this->request->getVar('image'),
                 ))->where('id', $this->request->getVar('data_id'))->update();
             }else{
                 $builder->insert(array(
-                    'name' => $this->request->getVar('name'),
-                    'address' => $this->request->getVar('address'),
-                    'nik' => $this->request->getVar('nik'),
-                    'case_report_id' => $this->request->getVar('case_report_id'),
+                    'title' => $this->request->getVar('title'),
+                    'description' => $this->request->getVar('description'),
                     'phone_number' => $this->request->getVar('phone_number'),
-                    'profile_photo_path' => $this->request->getVar('profil_photo_path'),
-                    'chronology' => $this->request->getVar('chronology'),
-                    'birth_date' => $this->request->getVar('birth_date'),
+                    'website' => $this->request->getVar('website'),
+                    'email' => $this->request->getVar('email'),
+                    'image' => $this->request->getVar('image'),
                 ));
             }
            
@@ -95,13 +91,13 @@ class SponsorsController extends \App\Controllers\BaseAdmin
                 $db->transRollback();
             } else {
                 $db->transCommit();
-                echo json_encode(['error' => 0, 'message' => 'Berhasil menambahkan data pelaku!']);exit;
+                echo json_encode(['error' => 0, 'message' => 'Berhasil menambahkan data sponsor!']);exit;
             }
-            echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data pelaku!', 'details' => $this->db->error()]);exit;
+            echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data sponsor!', 'details' => $this->db->error()]);exit;
         } catch (\Exception $e) {
             echo json_encode(['error' => 1, 'message' => $e->getMessage()]);exit;
         }
 
-        echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data pelaku!']);exit;
+        echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data sponsor!']);exit;
     }
 }

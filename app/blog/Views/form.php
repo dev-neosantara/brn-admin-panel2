@@ -23,42 +23,32 @@
                 </div>
             </div>
             <div class="row mb-4 pr-2">
-                <?php if (isset($data_id)) { ?>
+                <?php if (isset($data_id) && $data->image != null && $data->image != "") { ?>
                     <div class="col-md-12">
-                        <?= view_cell("\Olshop\Controllers\Product::listimage", ['data_id' => $data_id]) ?>
+                        <img src="<?= base_url('uploads/article/'.$data->image) ?>" alt="gambar cover">
                     </div>
                 <?php } ?>
                 <div class="col-md-12">
                     <label for="">Foto Cover</label>
-                    <form action="<?php echo (isset($data_id)) ? base_url('/blog/article/update') : base_url('/blog/article/insert') ?>" method="post" class="dropzone" id="pdimg">
+                    <form action="<?php echo (isset($data_id)) ? base_url('/blog/articles/update') : base_url('/blog/articles/insert') ?>" method="post" class="dropzone" id="pdimg">
                         <!-- <div id="pdimg"></div> -->
                         <div class="dz-message" data-dz-message><span>Klik atau jatuhkan file foto Artikel disini!</span></div>
                     </form>
                 </div>
-                <div class="col-md-12">
-                <div class="form-group">
-                        <label for="category">Kategori</label>
-                        <select name="category" id="category" class="form-control form-control-user">
-                            <option value="">Pilih kategori</option>
-                            <?php foreach($categories as $cat): ?>
-                                <option value="<?= $cat->id ?>"><?= $cat->name ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-                </div>
+               
             </div>
                     
             <div class="row">
                 <div class="col-md-12">
                     <div class="form-group">
                         <div class="custom-control custom-checkbox small">
-                            <input type="checkbox" class="custom-control-input" id="is_published" <?php echo isset($data) && (int)$data->is_published == 1 ? "checked" : '' ?>>
+                            <input type="checkbox" class="custom-control-input" id="is_published" <?php echo isset($data) && (int)$data->status == 'published' ? "checked" : '' ?>>
                             <label class="custom-control-label" for="is_published">Publish Artikel ini? (jika iya, maka Artikel akan langsung terlihat)</label>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-12">
-                    <button onclick="send()" class="btn btn-primary">Tambah Artikel</button>
+                    <button onclick="send()" class="btn btn-primary">Simpan</button>
                 </div>
             </div>
         </div>
@@ -93,8 +83,8 @@
         sending: function(file, xhr, formData) {
             formData.append('title', $('#title').val());
             formData.append('content', contentdata);
-            formData.append('category', $('#category').val());
-            formData.append('status', $('#is_published').val() == 'on' ? "PUBLISHED" : "DRAFT");
+            formData.append('category', 0); //edit nanti
+            formData.append('status', $('#is_published').val() == 'on' ? "published" : "draft");
             <?php if (isset($data_id)) { ?>
                 formData.append('data_id', <?= $data_id ?>)
             <?php } ?>

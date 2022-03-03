@@ -21,6 +21,28 @@ class Article extends \App\Controllers\BaseAdmin
         echo view('Blog\Views\list');
     }
 
+    public function publish($id)
+    {
+        $db = \Config\Database::connect();
+        $cat = $db->table('articles')->select('articles.*')->where('id', $id)->get()->getRowArray();
+        $msg = 'Publish';
+        if(count($cat) > 0){
+            
+            $set = array(
+                'status' => 'publised'
+            );
+            if($cat['status'] == 'published'){
+                $set['status'] = 'draft';
+                $msg = 'Unpublish';
+            }
+
+            $db->table('articles')->set($set)->update();
+            echo json_encode(['error' => 0, 'message' => 'Berhasil '.$msg.' artikel']);exit;
+        }
+
+        echo json_encode(['error' => 1, 'message' => 'Gagal '.$msg.' artikel']);exit;
+    }
+
     public function form($id = null)
     {
         $db      = \Config\Database::connect();
@@ -181,6 +203,7 @@ class Article extends \App\Controllers\BaseAdmin
         try {
             $db->transBegin();
             $builder = $db->table('articles');
+            
             $builder->insert(array(
                 'title' => $this->request->getPost('title'),
                 'content' => $this->request->getPost('content'),

@@ -13,9 +13,7 @@
 
     <!-- Custom fonts for this template-->
     <link href="<?= base_url() ?>/lib/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="<?= base_url() ?>/css/sb-admin-2.min.css" rel="stylesheet">
@@ -46,7 +44,7 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 
-                   <?= $this->renderSection('content') ?>
+                    <?= $this->renderSection('content') ?>
 
                 </div>
                 <!-- /.container-fluid -->
@@ -76,8 +74,7 @@
     </a>
 
     <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -118,7 +115,43 @@
                 toast.addEventListener('mouseenter', Swal.stopTimer)
                 toast.addEventListener('mouseleave', Swal.resumeTimer)
             }
-            });
+        });
+
+        function validation(target, val = false) {
+            let url = target.dataset.validationurl;
+            let key = target.name;
+            let value = val ? val : target.value;
+            if (value == "" || key == "" || url == "") {
+                return;
+            }
+            let params = {};
+            params[key] = value;
+
+            axios.post(url, params)
+                .then(function(response) {
+                    // console.log(response.data);
+                    if (parseInt(response.data.error) == 1 && document.querySelector('#' + key + "_errors").innerText == "") {
+
+                        Toast.fire({
+                            icon: 'error',
+                            title: response.data.message
+                        })
+                        document.querySelector('#' + key + "_errors").innerText = response.data.message;
+                        target.classList.add('border-red-400');
+                    } else if (parseInt(response.data.error) == 0) {
+                        document.querySelector('#' + key + "_errors").innerText = "";
+                        target.classList.remove('border-red-400');
+                    }
+
+                })
+                .catch(function(error) {
+                    console.log(error);
+                    Toast.fire({
+                        icon: 'error',
+                        title: 'Tidak dapat memvalidasi data ' + key
+                    })
+                });
+        }
     </script>
     <?= $this->renderSection('foot') ?>
 

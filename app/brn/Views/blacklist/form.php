@@ -174,7 +174,7 @@
         var params = {
             name: $('#name').val(),
             nik: $('#nik').val(),
-            phone_number: phone.getRawValue,
+            phone_number: phone.getRawValue(),
             profile_photo_path: images,
             case_report_id: $('#case_report_id').val(),
             address: $('#address').val(),
@@ -235,41 +235,7 @@
 
     }
 
-    function validation(target, val = false) {
-        let url = target.dataset.validationurl;
-        let key = target.name;
-        let value = val ? val : target.value;
-        if (value == "" || key == "" || url == "") {
-            return;
-        }
-        let params = {};
-        params[key] = value;
-
-        axios.post(url, params)
-            .then(function(response) {
-                // console.log(response.data);
-                if (parseInt(response.data.error) == 1 && document.querySelector('#' + key + "_errors").innerText == "") {
-
-                    Toast.fire({
-                        icon: 'error',
-                        title: response.data.message
-                    })
-                    document.querySelector('#' + key + "_errors").innerText = response.data.message;
-                    target.classList.add('border-red-400');
-                } else if (parseInt(response.data.error) == 0) {
-                    document.querySelector('#' + key + "_errors").innerText = "";
-                    target.classList.remove('border-red-400');
-                }
-
-            })
-            .catch(function(error) {
-                console.log(error);
-                Toast.fire({
-                    icon: 'error',
-                    title: 'Tidak dapat memvalidasi data ' + key
-                })
-            });
-    }
+   
 
     function cekdata() {
         if ($('#nik').val() == '') {

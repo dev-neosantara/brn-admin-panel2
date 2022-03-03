@@ -38,15 +38,16 @@ $routes->group('blacklist', ['namespace' => 'Brn\Controllers'], function ($route
     $routes->get('add', 'BlacklistController::form', ['as' => 'add_blacklist']);
     $routes->get('edit/(:num)', 'BlacklistController::form/$1');
     $routes->get('hapus/(:num)', 'BlacklistController::delete/$1');
-    // $routes->post('category/add', 'Article::categoryinsert');
-    // $routes->get('category/add', 'Article::categoryadd', ['as' => 'add_category']);
-    // $routes->get('category/edit/(:num)', 'Article::categoryadd/$1', ['as' => 'edit_category']);
-    // // $routes->get('category/edit/(:num)', 'Article::categoryadd/$1', ['as' => 'edit_category']);
-    
-    // $routes->get('categoriesajax', 'Article::categoriesajax');
-    // $routes->get('categories', 'Article::categories');
-    // $routes->get('category/delete/(:num)', 'Article::deletecat/$1');
     $routes->post('insert', 'BlacklistController::insertblacklist', ['as' => 'insert_blacklist']);
+});
+$routes->group('sponsors', ['namespace' => 'Brn\Controllers'], function ($routes) {
+    $routes->get('/', 'SponsorsController::index');
+    // $routes->get('articles', 'Article::index', ['as' => 'list_article']);
+    $routes->get('list', 'SponsorsController::listajax', ['as' => 'list_sponsor_ajax']);
+    $routes->get('add', 'SponsorsController::form', ['as' => 'add_sponsor']);
+    $routes->get('edit/(:num)', 'SponsorsController::form/$1');
+    $routes->get('hapus/(:num)', 'SponsorsController::delete/$1');
+    $routes->post('insert', 'SponsorsController::insert', ['as' => 'insert_sponsor']);
 });
 
 /*

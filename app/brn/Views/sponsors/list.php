@@ -16,26 +16,28 @@
 <!-- DataTales Example -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Data Artikel</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Data Sponsor</h6>
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-bordered" id="articleTable" width="100%" cellspacing="0">
+            <table class="table table-bordered" id="sponsorTable" width="100%" cellspacing="0">
                 <thead>
                     <tr>
                         <th>No</th>
-                        <th>Judul</th>
-                        <th>User</th>
-                        <th>Status</th>
+                        <th>Nama Perusahaan</th>
+                        <th>Logo</th>
+                        <th>Website</th>
+                        <th>Total Poin</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr>
                     <th>No</th>
-                        <th>Judul</th>
-                        <th>User</th>
-                        <th>Status</th>
+                        <th>Nama Perusahaan</th>
+                        <th>Logo</th>
+                        <th>Website</th>
+                        <th>Total Poin</th>
                         <th>Action</th>
                     </tr>
                 </tfoot>
@@ -54,16 +56,17 @@
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jq-3.6.0/jszip-2.5.0/dt-1.11.3/b-2.1.1/b-html5-2.1.1/r-2.2.9/rg-1.1.4/sc-2.0.5/sp-1.4.0/datatables.min.js"></script>
 
 <script>
+    const API_BASE_URL = "https://api.brnjuara.com/storage";
     $(document).ready(function() {
-        $('#articleTable').DataTable({
+        $('#sponsorTable').DataTable({
             dom: 'lBfrtip',
             processing: true,
             serverSide: true,
             order: [], //init datatable not ordering
-            ajax: "<?php echo site_url('blog/articles/list') ?>",
+            ajax: "<?php echo site_url('sponsors/list') ?>",
             buttons: {
                 buttons: [
-                    `<a href="<?= route_to('add_article') ?>" class="btn btn-primary btn-sm flex inline"><i class="fas fa-plus"></i>&nbsp;Tambah Artikel</a>`
+                    `<a href="<?= route_to('add_sponsor') ?>" class="border bg-blue-500 text-white px-2 py-1 rounded-md flex space-x-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg><span>Tambah Sponsor</span></a>`
                 ]
             },
             columnDefs: [{
@@ -71,27 +74,24 @@
                     orderable: false
                 },
                 {
-                    targets: 4,
+                    targets: 2,
                     render: function(data, type, full, meta) {
-                        
-                        let pubclass = full[3] == 1 ? "btn-danger" : "btn-success";
-                        let pubmsg = full[3] == 1 ? "Unpublish" : "Publish";
-                        let pubicon = full[3] == 1 ? "fa-chevron-down" : "fa-chevron-up";
-                        if (type === 'display') {
-                            data = `<a title="Edit artikel ini" class="btn btn-primary" href="<?= base_url('blog/articles/edit') ?>/` + data + `">
-                                    <i class="fas fa-pencil-alt"></i>
-                                <span></span>
-                            </a>
-                            <a title="Hapus produk ini" class="btn btn-danger" href="#" onclick="deletepro('` + full[1] + `', ` + full[5] + `)">
-                                    <i class="fas fa-trash"></i>
-                                <span></span>
-                            </a>
-                            <a title="Unpublished produk ini" class="btn `+ pubclass +`" href="#" onclick="publish('` + full[1] + `', ` + full[5] + `)">
-                                    <i class="fas `+ pubicon +`"></i>
-                                <span>`+ pubmsg +`</span>
-                            </a>`
+                        let res = "";
+                        if (type === 'display' && full[2] != null) {
+                            res += `<a href="${API_BASE_URL}/${full[2]}" target="_blank" class="underline flex space-x-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>Lihat</a>`;
                         }
-                        return data;
+                        return res;
+                    }
+                },
+                {
+                    targets: 5,
+                    render: function(data, type, full, meta) {
+                        let res = "";
+                        if (type === 'display') {
+                            res += `<a href="<?= base_url('sponsors/edit') ?>/${full[5]}" class="flex space-x-2 border rounded-lg bg-green-500 text-center text-white justify-center items-center py-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>Edit</a>`;
+                                res += `<a href="#" onclick="deletepro(${full[5]})" class="flex space-x-2 border rounded-lg bg-red-400 text-center text-white justify-center items-center py-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Hapus</a>`;
+                        }
+                        return res;
                     }
                 }
             ]
@@ -103,24 +103,16 @@
         };
     });
 
-    function createManageBtn() {
-        return '<button id="manageBtn" type="button" onclick="myFunc()" class="btn btn-success btn-xs">Manage</button>';
-    }
-
-    function myFunc() {
-        console.log("Button was clicked!!!");
-    }
-
-    function publish(name, id, extra = 'Publish') {
-        const url = "<?= base_url('blog/articles/publish') ?>/" + id;
+    function publish(name, id) {
+        const url = "<?= base_url('olshop/product/publish') ?>/" + id;
         Swal.fire({
             title: 'Apa anda yakin?',
-            text: "Anda akan mem"+extra+" artikel ini?",
+            text: "Anda akan mempublish produk " + name,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, '+extra+' artikel ini!'
+            confirmButtonText: 'Ya, publish produk ini!'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch(url)
@@ -128,13 +120,13 @@
                     .then(data => {
                         if (data.error == 0) {
                             Swal.fire(
-                                extra + 'd!',
+                                'Published!',
                                 data.message,
                                 'success'
                             ).then(() => {
                                 window.location.reload();
                             });
-                            
+
                             return;
                         }
                         Swal.fire(
@@ -147,16 +139,17 @@
             }
         })
     }
+
     function deletepro(id) {
-        const url = "<?= base_url('blog/articles/delete') ?>/" + id;
+        const url = "<?= base_url('sponsors/hapus') ?>/" + id;
         Swal.fire({
             title: 'Apa anda yakin?',
-            text: "Anda akan menghapus artikel ini? ",
+            text: "Anda akan menghapus data ini? ",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: 'Ya, hapus artikel ini!'
+            confirmButtonText: 'Ya, hapus data sponsor ini!'
         }).then((result) => {
             if (result.isConfirmed) {
                 fetch(url)
@@ -170,7 +163,7 @@
                             ).then(() => {
                                 window.location.reload();
                             });
-                            
+
                             return;
                         }
                         Swal.fire(

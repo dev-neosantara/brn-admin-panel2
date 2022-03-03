@@ -75,7 +75,7 @@
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="<?= base_url('sponsors') ?>">
             <i class="fas fa-fw fa-user-tie"></i>
             <span>Sponsor</span>
         </a>
