@@ -90,24 +90,28 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                            <label for="">Gambar Cover</label>
-                            <form action="<?= 'https://api.brnjuara.com/api/upload-files' ?>" method="post" class="dropzone" id="pdimg">
-                                <!-- <div id="pdimg"></div> -->
-                                <div class="dz-message" data-dz-message><span>Klik atau jatuhkan file foto KTP disini!</span></div>
-                            </form>
+                    <?php if (isset($data_id) && isset($data->image)) { ?>
+                        <div class="form-group">
+                            <label for=""></label>
+                            <img src="<?= isset($data->image) ? base_url($data->image) : '' ?>" alt="" srcset="">
                         </div>
+                    <?php } ?>
+                    <div class="form-group">
+                        <label for="">Gambar Cover</label>
+                        <input type="file" name="image" id="image" class="form-control">
+                    </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-md-12">
+                <!-- <div class="col-md-12">
                     <div class="form-group">
                         <div class="custom-control custom-checkbox small">
-                            <input type="checkbox" class="custom-control-input" id="active" <?php echo isset($data) && (int)$data->active == 1 ? "checked" : '' ?>>
+                            <input type="checkbox" class="custom-control-input" id="active" <?php //echo isset($data) && (int)$data->active == 1 ? "checked" : '' 
+                                                                                            ?>>
                             <label class="custom-control-label" for="active">Sponsor aktif? (jika iya, maka Sponsor akan terlihat di aplikasi)</label>
                         </div>
                     </div>
-                </div>
+                </div> -->
                 <div class="col-md-12">
                     <button onclick="send()" class="btn btn-primary">Simpan</button>
                 </div>
@@ -132,10 +136,10 @@
     var lng = -6.888;
     var map = L.map('map').setView([lng, lat], 8);
     var marker = new L.Marker(map.getCenter());
-    
+
 
     marker.addTo(map);
-    map.on('moveend', function(e){
+    map.on('moveend', function(e) {
         marker.bindTooltip("Lokasi Event").openTooltip();
         // console.log();
         var res = map.getCenter();
@@ -143,22 +147,23 @@
         lng = res.lng;
     });
 
-    map.on('move', function(){
+    map.on('move', function() {
         marker.setLatLng(map.getCenter());
     })
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }).addTo(map);
-    
+
     const search = new GeoSearch.GeoSearchControl({
         provider: new GeoSearch.OpenStreetMapProvider(),
     });
     map.addControl(search);
     map.on('click', mapClick);
-    function mapClick(e){
+
+    function mapClick(e) {
         console.log(e.latlng.lat);
-        L.marker([10.496093,-66.881935]).addTo(map)
+        L.marker([10.496093, -66.881935]).addTo(map)
     }
     $('#prov').select2({
         placeholder: 'Pilih ',
@@ -278,28 +283,7 @@
         }
     });
 
-    // var contentdata = "";
-    Dropzone.autoDiscover = false;
-    var ds = $("#logo").dropzone({
-        paramName: "files[]", // The name that will be used to transfer the file
-        maxFilesize: 10, // MB
-        autoProcessQueue: false,
-        multiple: false,
-        accept: function(file, done) {
-            if (done) {
-                done();
-            }
-        },
-        success: function(file, response) {
-            image = response.data.file_paths[0];
-            sendapi();
-            // console.log(response);
-        },
-        sending: function(file, xhr, formData) {
-            formData.append('key', 'freekeetiiw');
-            // console.log(formData);
-        }
-    });
+
 
     function sendapi() {
         Toast.fire({
@@ -313,21 +297,33 @@
             description: $('#description').val(),
             start_date: $('#start_date').data('datepicker').getFormattedDate('yyyy-mm-dd'),
             end_date: $('#end_date').data('datepicker').getFormattedDate('yyyy-mm-dd'),
-            start_time: $('#start_time'),
+            start_time: $('#start_time').val(),
             type: $('#type').val(),
             address: $('#address').val(),
             area_id: $('#city').val(),
-            image: image,
+            image: $('input[type=file]').get(0).files[0],
             data_id: null
         };
+        
         <?php if (isset($data_id) && $data_id != null) { ?>
             params['data_id'] = <?= $data_id ?>;
         <?php } ?>
+        var datas = new FormData();
+        for (var key in params) {
+            datas.append(key, params[key]);
+        }
         // console.log(params);return;
         var urls = "<?= base_url('events/insert') ?>";
-        axios.post(urls, params)
+        axios({
+                url: urls,
+                method: "post",
+                data: datas,
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+            })
             .then(function(response) {
-                
+
                 if (response.data.error == 0) {
                     successins(true, response.data.message);
                 } else {
@@ -404,18 +400,7 @@
         if (!data) {
             return;
         }
-
-        let form = $('#logo');
-        var dzone = document.querySelector("#logo").dropzone;
-        if (dzone.getQueuedFiles().length > 0) {
-            Toast.fire({
-                icon: 'info',
-                title: "sedang upload gambar! mohon tunggu"
-            });
-            dzone.processQueue();
-        } else {
-            dzone.uploadFiles([]); //send empty 
-        }
+        sendapi();
     }
 </script>
 

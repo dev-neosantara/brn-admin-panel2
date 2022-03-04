@@ -56,7 +56,7 @@ $routes->group('events', ['namespace' => 'Brn\Controllers'], function ($routes) 
     $routes->get('edit/(:num)', 'EventsController::form/$1');
     $routes->get('hapus/(:num)', 'EventsController::delete/$1');
     $routes->post('insert', 'EventsController::insert', ['as' => 'insert_event']);
-    $routes->post('update', 'EventsController::insert', ['as' => 'insert_event']);
+    $routes->post('update', 'EventsController::insert', ['as' => 'update_event']);
 });
 
 /*
