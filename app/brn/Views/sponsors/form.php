@@ -34,7 +34,7 @@
                     </div>
                     <div class="form-group">
                         <label for="phone_number">No HP Kontak Sponsor</label>
-                        <input type="text" class="form-control form-control-user" id="phone_number" tabindex="0" placeholder="Contoh : user@sponsor.com" name="phone_number" value="<?php echo isset($data) && isset($data->phone_number) ? $data->phone_number : '' ?>">
+                        <input type="text" class="form-control form-control-user" id="phone_number" tabindex="0" placeholder="Contoh : 08xxxxxx" name="phone_number" value="<?php echo isset($data) && isset($data->phone_number) ? $data->phone_number : '' ?>">
                     </div>
                     <div class="form-group">
                         <label for="website">Website Sponsor</label>

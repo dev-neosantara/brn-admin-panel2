@@ -18,11 +18,27 @@ class Extra extends ResourceController
 
     public function uploaderext($id = 'files', $url = 'https://api.brnjuara.com/api/upload-files', $text = 'Jatuhkan file disini!')
     {
-        $db      = \Config\Database::connect();
+        // $db      = \Config\Database::connect();
         return view('App\Views\components\uploaderext', array(
             'id' => $id, $url => $url, $text => $text
         ));
     }
+
+    public function regional($city = 0, $subdistrict = 0, $region_id = 'prov', $area_id = 'city', $subdistrict_id = 'subdistrict')
+    {
+        // $db      = \Config\Database::connect();
+        return view('App\Views\components\region', array(
+            'areas' => $city, 'subdistrict' => $subdistrict, 'region_id' => $region_id, 'area_id' => $area_id, 'subdistrict_id' => $subdistrict_id
+        ));
+    }
+    public function regionaljs($city = 0, $subdistrict = 0, $region_id = 'prov', $area_id = 'city', $subdistrict_id = 'subdistrict')
+    {
+        // $db      = \Config\Database::connect();
+        return view('App\Views\components\region', array(
+            'areas' => $city, 'subdistrict' => $subdistrict, 'region_id' => $region_id, 'area_id' => $area_id, 'subdistrict_id' => $subdistrict_id
+        ));
+    }
+
 
     public function get_regions($is_registered = false)
     {

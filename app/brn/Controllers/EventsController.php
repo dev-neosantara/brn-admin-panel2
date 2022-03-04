@@ -66,4 +66,50 @@ class EventsController extends \App\Controllers\BaseAdmin
             ->addNumbering() //it will return data output with numbering on first column
             ->toJson();
     }
+
+    public function insert()
+    {
+        print_r($this->request->getVar());exit;
+        $db      = \Config\Database::connect();
+        try {
+            $db->transBegin();
+            $builder = $db->table('events');
+            if($this->request->getVar('data_id') != null){
+                $builder->set(array(
+                    'name' => $this->request->getVar('name'),
+                    'address' => $this->request->getVar('address'),
+                    'nik' => $this->request->getVar('nik'),
+                    'case_report_id' => $this->request->getVar('case_report_id'),
+                    'phone_number' => $this->request->getVar('phone_number'),
+                    'profile_photo_path' => $this->request->getVar('profil_photo_path'),
+                    'chronology' => $this->request->getVar('chronology'),
+                    'birth_date' => $this->request->getVar('birth_date'),
+                ))->where('id', $this->request->getVar('data_id'))->update();
+            }else{
+                $builder->insert(array(
+                    'name' => $this->request->getVar('name'),
+                    'address' => $this->request->getVar('address'),
+                    'nik' => $this->request->getVar('nik'),
+                    'case_report_id' => $this->request->getVar('case_report_id'),
+                    'phone_number' => $this->request->getVar('phone_number'),
+                    'profile_photo_path' => $this->request->getVar('profil_photo_path'),
+                    'chronology' => $this->request->getVar('chronology'),
+                    'birth_date' => $this->request->getVar('birth_date'),
+                ));
+            }
+           
+        
+            if ($db->transStatus() === false) {
+                $db->transRollback();
+            } else {
+                $db->transCommit();
+                echo json_encode(['error' => 0, 'message' => 'Berhasil menambahkan data pelaku!']);exit;
+            }
+            echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data pelaku!', 'details' => $this->db->error()]);exit;
+        } catch (\Exception $e) {
+            echo json_encode(['error' => 1, 'message' => $e->getMessage()]);exit;
+        }
+
+        echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data pelaku!']);exit;
+    }
 }

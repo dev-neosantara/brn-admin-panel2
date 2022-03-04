@@ -482,7 +482,7 @@
             },
             toValue: function(date, format, language) {
                 var d = new Date(date);
-                d.setDate(d.getDate() + 7);
+                d.setDate(d.getDate());
                 return new Date(d);
             }
         }
