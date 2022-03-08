@@ -1,20 +1,21 @@
 <?= $this->extend('App\Views\template') ?>
 <?= $this->section('head') ?>
 <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
-<!-- <link rel="stylesheet" href="<?= ROOTPATH.'node_modules/dropzone.css' ?>"> -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/tomik23/autocomplete@1.7.3/dist/css/autocomplete.min.css" />
 
 <?= $this->endSection() ?>
 <?= $this->section('content') ?>
 <div class="card shadow mb-4">
     <div class="card-header py-3">
-        <h6 class="m-0 font-weight-bold text-primary">Tambah User</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Tambah User <?= isset($role) ? strtoupper($role) : '' ?></h6>
     </div>
     <div class="card-body">
         <div class="container">
             <form id="formuser" action="#" method="post">
+
                 <div class="row border-b mb-4 pb-4">
                     <div class="col-md-12">
                         <div class="row">
@@ -29,30 +30,30 @@
                                     <label for="name">Gender</label>
                                     <select name="gender" id="gender" class="form-control form-control-user">
                                         <option value="">Pilih Jenis Kelamin Anda!</option>
-                                        <option value="male" <?= isset($data) && property_exists($data, 'gender') && $data->name == 'male' ? 'selected' : ''; ?>>Laki-laki</option>
-                                        <option value="female" <?= isset($data) && property_exists($data, 'gender') && $data->name == 'female' ? 'selected' : ''; ?>>Perempuan</option>
+                                        <option value="male" <?= isset($data) && property_exists($data, 'gender') && $data->gender == 'male' ? 'selected' : ''; ?>>Laki-laki</option>
+                                        <option value="female" <?= isset($data) && property_exists($data, 'gender') && $data->gender == 'female' ? 'selected' : ''; ?>>Perempuan</option>
                                     </select>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="nik_ktp">NIK KTP</label>
-                                    <input type="text" data-validationurl="<?= base_url('extra/valid_nik') ?>" onblur="validation(this)" class="form-control form-control-user" id="nik_ktp" tabindex="0" placeholder="Masukan nik ktp" name="nik_ktp" value="<?php echo isset($data) && property_exists($data, 'nik_ktp') ? $data->nik_ktp : '' ?>">
+                                    <input type="text" data-validationurl="<?= base_url('extra/valid_nik') ?>" onblur="validation(this)" data-id="<?= isset($data_id) ? $data_id : '' ?>"class="form-control form-control-user" id="nik_ktp" tabindex="0" placeholder="Masukan nik ktp" name="nik_ktp" value="<?php echo isset($data) && property_exists($data, 'nik_ktp') ? $data->nik_ktp : '' ?>">
                                     <span id="nik_ktp_errors" class="text-red-400"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" data-validationurl="<?= base_url('extra/valid_email') ?>" class="form-control form-control-user" id="email" tabindex="0" placeholder="email@domain.com" name="email" value="<?php echo isset($data) && property_exists($data, 'email') ? $data->email : '' ?>" onblur="validation(this)">
+                                    <input type="email" data-validationurl="<?= base_url('extra/valid_email')?>" data-id="<?= isset($data_id) ? $data_id : '' ?>" class="form-control form-control-user" id="email" tabindex="0" placeholder="email@domain.com" name="email" value="<?php echo isset($data) && property_exists($data, 'email') ? $data->email : '' ?>" onblur="validation(this)">
                                     <span id="email_errors" class="text-red-400"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="phone_number">No HP</label>
-                                    <input data-validationurl="<?= base_url('extra/valid_phone') ?>" minlength="9" maxlength="13" type="text" class="form-control form-control-user" id="phone_number" tabindex="0" placeholder="08xxxx" name="phone_number" value="<?php echo isset($data) && property_exists($data, 'phone_number') ? $data->phone_number : '' ?>">
-                                    <span id="phone_number_errors" class="text-red-400"></span>
+                                    <label for="phone">No HP</label>
+                                    <input data-validationurl="<?= base_url('extra/valid_phone/') ?>" data-id="<?= isset($data_id) ? $data_id : '' ?>" minlength="9" type="text" class="form-control form-control-user" id="phone" tabindex="0" placeholder="08xxxx" name="phone" value="<?php echo isset($data) && property_exists($data, 'phone_number') ? $data->phone_number : '' ?>">
+                                    <span id="phone_errors" class="text-red-400"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -65,7 +66,7 @@
                                 <div class="form-group">
                                     <label for="date_of_birth">Tgl Lahir</label>
                                     <div class="input-group date tgllahir" data-provide="datepicker">
-                                        <input type="text" class="form-control" id="date_of_birth" placeholder="01/01/2001">
+                                        <input type="text" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="01/01/2001">
                                         <div class="input-group-addon">
                                             <span class="glyphicon glyphicon-th"></span>
                                         </div>
@@ -78,11 +79,14 @@
                                     <input type="text" class="form-control form-control-user" id="year" tabindex="0" name="year" value="<?php echo isset($data) && property_exists($data, 'year_approved') ? $data->year_approved : '' ?>">
                                 </div>
                             </div>
-                            <!-- <?php //if (isset($data_id)) { ?>
+                            <!-- <?php //if (isset($data_id)) { 
+                                    ?>
                                 <div class="col-md-4 col-sm-12">
-                                    <?php //view_cell("\Olshop\Controllers\Product::listimage", ['data_id' => $data_id]) ?>
+                                    <?php //view_cell("\Olshop\Controllers\Product::listimage", ['data_id' => $data_id]) 
+                                    ?>
                                 </div>
-                            <?php //} ?> -->
+                            <?php //} 
+                            ?> -->
                             <!-- <div class="col-md-4 col-sm-12">
                             <label for="">Foto Profile</label>
                             <form action="https://api.brnjuara.com/api/upload-files" method="post" class="dropzone" id="pdimg"> -->
@@ -98,29 +102,33 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="role">Jabatan/Role</label>
-                            <select name="role" id="role" class="form-control form-control-user">
-                                <option value="">Pilih Role !</option>
-                                <?php if (isset($roles)) {
-                                    foreach ($roles as $rol) :
-                                ?>
-                                        <option value="<?= $rol->id; ?>" data-name="<?= $rol->name; ?>" <?= isset($role) && $role == $rol->name ? 'selected' : '' ?>><?= $rol->display_name == '' ? $rol->name : $rol->display_name; ?></option>
-                                <?php endforeach;
-                                } ?>
-                            </select>
+                            <?php if (isset($role)) { ?>
+                                <p><?= strtoupper($role) ?></p>
+                            <?php } else { ?>
+                                <select name="role" id="role" class="form-control form-control-user">
+                                    <option value="">Pilih Role !</option>
+                                    <?php if (isset($roles)) {
+                                        foreach ($roles as $rol) :
+                                    ?>
+                                            <option value="<?= $rol->id; ?>" data-name="<?= $rol->name; ?>" <?= isset($role) && $role == $rol->name || (isset($data) && property_exists($data, 'role') && $rol->name == $data->role) ? 'selected' : '' ?>><?= $rol->display_name == '' ? $rol->name : $rol->display_name; ?></option>
+                                    <?php endforeach;
+                                    } ?>
+                                </select>
+                            <?php } ?>
                         </div>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row" id="administratif">
                     <hr>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="korda">Registrasi ke korda ?</label>
+                            <label for="korda">Registrasi ke korwil ?</label>
                             <select name="korda" id="korda" class="form-control form-control-user korda"></select>
                         </div>
                     </div>
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="korwil">Registrasi ke korwil ?</label>
+                            <label for="korwil">Registrasi ke korda ?</label>
                             <select name="korwil" id="korwil" class="form-control form-control-user korwil"></select>
                         </div>
                     </div>
@@ -165,13 +173,21 @@
                                     <textarea name="address" id="address" cols="30" rows="10" class="form-control form-control-user"></textarea>
                                 </div>
                             </div>
-                            <!-- <div class="col-md-12">
+                            <div class="col-md-12">
                                 <div class="row">
                                     <div class="col-md-12">
+                                        <label for="">Lokasi Rental User</label>
+                                        <div class="auto-search-wrapper loupe">
+                                            <input type="text" autocomplete="off" id="search" class="w-full px-2" placeholder="masukan nama kota/daerah">
+                                            <div class="auto-results-wrapper">
+                                                <ul id="auto-search-results" tabindex="0" role="listbox"></ul>
+                                            </div><button class="auto-clear hidden" type="button" aria-label="clear text from input"></button>
+                                        </div>
+                                        <br>
                                         <div class="map" id="map" style="height: 400px;"></div>
                                     </div>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,7 +206,7 @@
                     </div>
                 </div> -->
                 <div class="col-md-12">
-                    <button onclick="sendapi()" class="btn btn-primary">Tambah User <?= isset($role) ? strtoupper($role) : "" ?></button>
+                    <button onclick="send()" class="btn btn-primary">Tambah User <?= isset($role) ? strtoupper($role) : "" ?></button>
                 </div>
             </div>
         </div>
@@ -202,52 +218,227 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cleave.js/1.6.0/addons/cleave-phone.id.js" integrity="sha512-U479UBH9kysrsCeM3Jz6aTMcWIPVpmIuyqbd+KmDGn6UJziQQ+PB684TjyFxaXiOLRKFO9HPVYYeEmtVi/UJIw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<!-- <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<!-- <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script> -->
-<!-- <script src="<?= base_url('js/map-provider.js') ?>"></script> -->
-<!-- <script src="<?= base_url('js/maps.js') ?>"></script> -->
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+<script src="https://cdn.jsdelivr.net/gh/tomik23/autocomplete@1.7.3/dist/js/autocomplete.min.js"></script>
+
+<script src="<?= base_url('js/map-provider.js') ?>"></script>
+<script src="<?= base_url('js/maps.js') ?>"></script>
+<!-- master data (edit) -->
 <script>
+const data = <?= isset($data) ? json_encode($data) : null ?>;
+</script>
+<!-- Custom script for maps -->
+<script>
+    // custom script for map
+    var lat = 108.495;
+    var lng = -6.888;
+    var map = L.map('map').setView([lng, lat], 8);
+    var marker = new L.Marker(map.getCenter());
+    marker.addTo(map);
+    // var osmGeocoder = new L.Control.OSMGeocoder();
+
+    map.on('moveend', function(e) {
+        marker.bindTooltip("Set ini sebagai alamat user").openTooltip();
+        // console.log();
+        var res = map.getCenter();
+        lat = res.lat;
+        lng = res.lng;
+    });
+
+    map.on('move', function() {
+        marker.setLatLng(map.getCenter());
+    })
+    map.on('locationfound', function() {
+        marker.setLatLng(map.getCenter());
+    })
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
+    }).addTo(map);
+</script>
+<!-- Geocoding maps -->
+<script>
+    // geocoding maps
+    // minimal configure
+    new Autocomplete("search", {
+        // default selects the first item in
+        // the list of results
+        selectFirst: true,
+
+        // The number of characters entered should start searching
+        howManyCharacters: 2,
+
+        // onSearch
+        onSearch: ({
+            currentValue
+        }) => {
+            // You can also use static files
+            // const api = '../static/search.json'
+            const api = `https://nominatim.openstreetmap.org/search?format=geojson&limit=5&city=${encodeURI(
+      currentValue
+    )}`;
+
+            /**
+             * jquery
+             */
+            // return $.ajax({
+            //     url: api,
+            //     method: 'GET',
+            //   })
+            //   .done(function (data) {
+            //     return data
+            //   })
+            //   .fail(function (xhr) {
+            //     console.error(xhr);
+            //   });
+
+            // OR -------------------------------
+
+            /**
+             * axios
+             * If you want to use axios you have to add the
+             * axios library to head html
+             * https://cdnjs.com/libraries/axios
+             */
+            // return axios.get(api)
+            //   .then((response) => {
+            //     return response.data;
+            //   })
+            //   .catch(error => {
+            //     console.log(error);
+            //   });
+
+            // OR -------------------------------
+
+            /**
+             * Promise
+             */
+            return new Promise((resolve) => {
+                fetch(api)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        resolve(data.features);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                    });
+            });
+        },
+        // nominatim GeoJSON format parse this part turns json into the list of
+        // records that appears when you type.
+        onResults: ({
+            currentValue,
+            matches,
+            template
+        }) => {
+            const regex = new RegExp(currentValue, "gi");
+
+            // if the result returns 0 we
+            // show the no results element
+            return matches === 0 ?
+                template :
+                matches
+                .map((element) => {
+                    return `
+          <li class="loupe">
+            <p>
+              ${element.properties.display_name.replace(
+                regex,
+                (str) => `<b>${str}</b>`
+              )}
+            </p>
+          </li> `;
+                })
+                .join("");
+        },
+
+        // we add an action to enter or click
+        onSubmit: ({
+            object
+        }) => {
+            const {
+                display_name
+            } = object.properties;
+            const cord = object.geometry.coordinates;
+
+            // custom id for marker
+            const customId = Math.random();
+
+            // create marker and add to map
+            marker = L.marker([cord[1], cord[0]], {
+                    title: display_name,
+                    id: customId,
+                })
+                .addTo(map)
+                .bindPopup(display_name);
+
+            // sets the view of the map
+            map.setView([cord[1], cord[0]], 8);
+
+            let res = map.getCenter();
+
+            lat = res.lat;
+            lng = res.lng;
+
+            // removing the previous marker
+            // if you want to leave markers on
+            // the map, remove the code below
+            map.eachLayer(function(layer) {
+                if (layer.options && layer.options.pane === "markerPane") {
+                    if (layer.options.id !== customId) {
+                        map.removeLayer(layer);
+                    }
+                }
+            });
+        },
+
+        // get index and data from li element after
+        // hovering over li with the mouse or using
+        // arrow keys ↓ | ↑
+        onSelectedItem: ({
+            index,
+            element,
+            object
+        }) => {
+            // console.log("onSelectedItem:", index, element, object);
+        },
+
+        // the method presents no results element
+        noResults: ({
+                currentValue,
+                template
+            }) =>
+            template(`<li>No results found: "${currentValue}"</li>`),
+    });
+</script>
+
+<script>
+    
+    
     var additional = {
         korda: null,
         korwil: null,
         prov: null,
-        kota: null,
-        kec: null,
-        phone: null
+        city: null,
+        subdistrict: null,
+        phone: null,
+        date_of_birth: null,
+        data_id: <?= isset($data_id) ? $data_id : "" ?>
     }
-    // var zoomLevel = 3;
-    // var mapCenter = [92.76481, -11.60655];
-    // var mapCenter2 = [141.0217, 6.519293];
-    // var southWest = L.latLng(mapCenter2),
-    //     northEast = L.latLng(mapCenter),
-    //     bounds = L.latLngBounds(southWest, northEast);
-    // var map = L.map('map', {
-    //     center: mapCenter,
-    //     zoom: zoomLevel
-    // });
-    // map.fitBounds(mapCenter, mapCenter2);
-    // L.tileLayer('https://{s}.tile.openstreetmap.org/' + formatted + '.png', {
-    //     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    //     subdomains: ['a', 'b', 'c']
-    // }).addTo(map);
-    // mapbox://styles/renaldimedia/cl04undvd000714oa3kc35e72
-    // https://api.mapbox.com/styles/v1/renaldimedia/cl04uwkh7000514mouzj5uwzv.html?title=view&access_token=pk.eyJ1IjoicmVuYWxkaW1lZGlhIiwiYSI6ImNqbng1ZncxNzA4b2Qzd214dWF6Ym9zOW4ifQ.zyBxgpZK_g5dl66zc28u5Q&zoomwheel=true&fresh=true#4.09/-2.41/118.67
-    // L.tileLayer.provider('MapBox', {
-    //     id: 'renaldimedia/cl04undvd000714oa3kc35e72',
-    //     accessToken: 'pk.eyJ1IjoicmVuYWxkaW1lZGlhIiwiYSI6ImNqbng1ZncxNzA4b2Qzd214dWF6Ym9zOW4ifQ.zyBxgpZK_g5dl66zc28u5Q'
-    // }).addTo(map);
     const baseUrl = "<?= base_url('users') ?>";
-    const role = "<?= isset($role) ? $role : '' ?>";
+    const role = "<?= isset($role) ? $role : (isset($data) && property_exists($data, 'role') ? $data->role : '') ?>";
     var areas = [];
     var subd = [];
     var tahunmasuk = new Date().getFullYear();
     $('#year').val(tahunmasuk);
-    var phone = new Cleave('#phone_number', {
+    var phone = new Cleave('#phone', {
         phone: true,
         phoneRegionCode: 'ID',
-        onValueChanged: function (e) {
-            let target = document.querySelector('#phone_number');
+        onValueChanged: function(e) {
+            let target = document.querySelector('#phone');
             let val = e.target.rawValue.replace("+62", "0");
             validation(target, val);
         }
@@ -257,9 +448,17 @@
         delimiter: '-',
         datePattern: ['Y']
     });
-    $('.korwil').select2();
+   $(document).ready(() => {
+    // $('.korwil').select2();
+    if(data != null && data.profile_photo_path != null && data.profile_photo_path != ""){
+        $("#profilephoto > div.dz-preview.dz-image-preview .dz-image").append(`<img src="https://auth.brnjuara.com/storage/${data.profile_photo_path}"`);    
+    }
+    
     $('.prov').select2({
         placeholder: "Tidak ada data provinsi!"
+    });
+     $('.korda').select2({
+        placeholder: "Tidak ada data korda!"
     });
     $('.city').select2({
         placeholder: "Pilih provinsi di atas!"
@@ -308,7 +507,7 @@
     });
     $('.prov').on('select2:select', function(e) {
         var data = e.params.data;
-        additional.prov = data.id;
+        // additional.prov = data.id;
         $('.city').select2({
             ajax: {
                 url: "<?= base_url('extra/areas') ?>/" + data.id,
@@ -350,7 +549,7 @@
     });
     $('.city').on('select2:select', function(e) {
         var data = e.params.data;
-        additional.kota = data.id;
+        // additional.kota = data.id;
         $('.subdistrict').select2({
             ajax: {
                 url: "<?= base_url('extra/subdistrict') ?>/" + data.id,
@@ -390,14 +589,10 @@
             }
         });
     });
-    $('.subdistrict').on('select2:select', function(e) {
-        var data = e.params.data;
-        additional.kec = data.id;
-    });
     $('.korda').select2({
         placeholder: 'Pilih ',
         ajax: {
-            url: "<?= base_url('extra/regions/1') ?>",
+            url: "<?= base_url('extra/regions/1').(isset($data) && $data->korda_id != null ? '?id='.$data->korda_id : '') ?>",
             dataType: 'json',
             data: function(params) {
                 var query = {
@@ -421,13 +616,20 @@
                         more: (params.page * 10) < data.count_filtered
                     }
                 };
+            },
+            success: function(e){
+                console.log(e);
+                <?php if(isset($data) && $data->korda_id != null){ ?>
+                    console.log('data must be selected : <?= $data->korda_id ?>');
+                $('.korda').val(<?= $data->korda_id ?>).trigger('change');
+                <?php } ?>
             }
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
         }
     });
     $('.korda').on('select2:select', function(e) {
         var data = e.params.data;
-        additional.korda = data.id;
+        // additional.korda = data.id;
         $('.korwil').select2({
             ajax: {
                 url: "<?= base_url('extra/areas') ?>/" + data.id + "/1",
@@ -459,10 +661,13 @@
             }
         });
     });
-    $('.korwil').on('select2:select', function(e) {
-        var data = e.params.data;
-        additional.korwil = data.id;
     });
+    // $('.korwil').on('select2:select', function(e) {
+    //     var data = e.params.data;
+    //     additional.korwil = data.id;
+    // });
+
+
     var tgllahir = $('.tgllahir').datepicker({
         startView: 2,
         title: "Tanggal Lahir",
@@ -482,20 +687,34 @@
             },
             toValue: function(date, format, language) {
                 var d = new Date(date);
-                d.setDate(d.getDate());
-                return new Date(d);
+                // d.setDate(d.getDate());
+                return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
             }
         }
     });
 
     function sendapi(image = "") {
-        if(!cekdata()){
+        if (!cekdata()) {
             return;
         }
         var params = $('#formuser').serializeArray();
-        // params = params.concat(additional);
+        var db = new Date(tgllahir.datepicker('getDate'));
         additional.phone = phone.getRawValue();
-        params['phone_number'] = phone.getRawValue();
+        additional.korda = document.querySelector("#korwil").value;
+        additional.korwil = document.querySelector("#korda").value;
+        additional.prov = document.querySelector("#prov").value;
+        additional.city = document.querySelector("#city").value;
+        additional.subdistrict = document.querySelector("#subdistrict").value;
+        additional.date_of_birth = db.getFullYear() + "-" + (db.getMonth() + 1) + "-" + db.getDate();
+        
+        if (image != "") {
+            params['profile_photo_path'] = image;
+            params['profile_image'] = image;
+        }
+        <?php if (isset($role)) { ?>
+            params['role'] = '<?= $role ?>'
+        <?php } ?>
+
         params = params.reduce(function(obj, item) {
             obj[item.name] = item.value;
             return obj;
@@ -508,10 +727,6 @@
         var urls = "<?= base_url('/users/tambah') ?>";
         axios.post(urls, params)
             .then(function(response) {
-                console.log(response.data);
-                // var data = JSON.parse(response);
-                // console.log(data);
-
                 if (response.data.error == 0) {
                     successins(true, response.data.message);
                 } else {
@@ -566,6 +781,14 @@
             Swal.fire(
                 'Perhatian!',
                 'Nama tidak boleh kosong!',
+                'error'
+            );
+            return false;
+        }
+        if ($('#nik_ktp').val() == '') {
+            Swal.fire(
+                'Perhatian!',
+                'NIK tidak boleh kosong!',
                 'error'
             );
             return false;
@@ -632,18 +855,12 @@
         return true;
     }
 
-    // function send() {
-    //     let data = cekdata();
-    //     if (data) {
-    //         let form = $('#pdimg');
-    //         var dzone = document.querySelector("#pdimg").dropzone;
-    //         if (dzone.getQueuedFiles().length > 0) {
-    //             dzone.processQueue();
-    //         } else {
-    //             dzone.uploadFiles([]); //send empty 
-    //         }
-    //     }
+    function send() {
+        let data = cekdata();
+        if (data) {
+            sendapi();
+        }
 
-    // }
+    }
 </script>
 <?= $this->endSection() ?>

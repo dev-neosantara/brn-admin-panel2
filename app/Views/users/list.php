@@ -104,6 +104,7 @@
                                 res += `
                                 <p class="flex items-center space-x-4"><span>Point : ${point}</span><a href="#" class=" text-blue-400 underline opacity-50 hover:opacity-100">Detail</a></p>
                                 `;
+                                
                             }
                         }
 
@@ -149,7 +150,8 @@
                                 `;
                             }
 
-                            res += `<a class="border rounded-lg py-1 px-1 bg-blue-400 text-white text-sm w-full text-center" href="<?= base_url('users/') ?>">Detail User</a>`
+                            res += `<a class="border rounded-lg py-1 px-1 bg-blue-400 text-white text-sm w-full text-center" href="<?= base_url('users/') ?>/${full[4]}">Detail User</a>`;
+                            res += `<a class="border rounded-lg py-1 px-1 bg-green-400 text-white text-sm w-full text-center" href="<?= base_url('users/update/') ?>/${full[4]}">Edit User</a>`;
                             
                         }
                         res += `</div>`;

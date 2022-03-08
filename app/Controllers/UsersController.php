@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use \Hermawan\DataTables\DataTable;
 
+use function PHPUnit\Framework\isNan;
+
 class UsersController extends BaseAdmin
 {
     protected $upload_path;
@@ -21,10 +23,10 @@ class UsersController extends BaseAdmin
             $title .= " Pendaftar Baru";
         } else if ($role == 'ext') {
             $title .= " Perpanjangan";
-        }else{
+        } else {
             $config = Config('Brn');
             // print_r($config->settings['roles'][0]);exit;
-            foreach($config->settings['roles'] as $r){
+            foreach ($config->settings['roles'] as $r) {
                 if ($role == $r['name']) {
                     $title .= " " . ($r['display_name'] == null ? strtoupper($role) : $r['display_name']);
                     break;
@@ -97,15 +99,16 @@ class UsersController extends BaseAdmin
         $data['roles'] = $db->table('roles')->get()->getResultObject();
         if ($id !== null) {
 
-            $user = $db->table('users as u')->join('user_personal_informations as upi', 'u.id = upi.user_id', 'left')->join('model_has_roles as mhr', 'u.id = mhr.model_id', 'left')->join('addresses as adr', 'u.id = adr.user_id', 'left')->where('u.id', $id)->get()->getRowObject();
+            $user = $db->table('users as u')->select('u.id, u.name,u.email, u.active, u.name, u.profile_photo_path, upi.id_card, upi.nik_ktp, upi.phone_number, upi.gender, upi.place_of_birth, upi.date_of_birth, upi.clothes_size, upi.company_name, upi.company_logo, upi.siupsku_number, upi.siupsku_image, upi.passport_image, upi.profile_image, upi.garage_image, upi.korwil_id, upi.korda_id, rl.name as role, adr.given_name, adr.street as subdistrict, adr.state as province, adr.city, adr.postal_code, adr.latitude, adr.longitude, adr.full_address, reg.region, ar.area, subs.subdistrict_name, korw.region as korwil_name, kord.area as korda_name')->join('user_personal_informations as upi', 'u.id = upi.user_id', 'left')->join('model_has_roles as mhr', 'u.id = mhr.model_id', 'left')->join('addresses as adr', 'u.id = adr.addressable_id', 'left')->join('roles as rl', 'mhr.role_id = rl.id', 'right')->join('regions as korw', 'upi.korwil_id = korw.id', 'left')->join('areas as kord', 'upi.korda_id = kord.id', 'left')->join('regions as reg', 'adr.state = reg.id', 'left')->join('areas as ar', 'adr.city = ar.id', 'left')->join('subdistrict as subs', 'adr.street = subs.id', 'left')->where('u.id', $id)->get()->getRow();
 
             $data['data_id'] = $id;
             $data['data'] = $user;
 
-            echo view('users/form', ['data_id' => $id, 'data' => $data]);
+            // print_r($data);exit;
+            echo view('users/form', $data);
         } else {
 
-            echo view('users/form', $data);
+            echo view('users/form', ['data' => $data]);
         }
     }
 
@@ -245,75 +248,204 @@ class UsersController extends BaseAdmin
     public function insertuser()
     {
         // print_r($_FILES);exit;
-        if($this->request->getVar('id_card') != null){
-            if(!$this->validate(['id_card' => "is_unique[user_personal_informations.id_card]"])){
+        $data_id = $this->request->getVar('data_id');
+        if ($data_id == null) {
+            if ($this->request->getVar('id_card') != null) {
+                if (!$this->validate(['id_card' => "is_unique[user_personal_informations.id_card]"])) {
+                    echo json_encode(['error' => 1, 'message' => $this->validator->getErrors()]);
+                    exit;
+                }
+            }
+
+            if (!$this->validate([
+                'name' => "required",
+                'email' => "required|valid_email|is_unique[users.email]",
+                'phone' => "required|is_unique[user_personal_informations.phone_numbe]",
+                'nik_ktp' => "is_unique[user_personal_informations.nik_kt]",
+
+                'gender' => "required",
+                'role' => "required",
+                'korda' => 'required|numeric',
+                'korwil' => 'required|numeric'
+            ])) {
                 echo json_encode(['error' => 1, 'message' => $this->validator->getErrors()]);
-            exit;
+                exit;
+            }
+        } else {
+            if ($this->request->getVar('id_card') != null) {
+                if (!$this->validate(['id_card' => "is_unique[user_personal_informations.id_card, user_id, " . $data_id . "]"])) {
+                    echo json_encode(['error' => 1, 'message' => $this->validator->getErrors()]);
+                    exit;
+                }
+            }
+
+            if (!$this->validate([
+                'name' => "required",
+                'email' => "required|valid_email|is_unique[users.email, users.id, " . $data_id . "]",
+                'phone' => "required|is_unique[user_personal_informations.phone_number, user_id, " . $data_id . "]",
+                'nik_ktp' => "is_unique[user_personal_informations.nik_ktp, user_id, " . $data_id . "]",
+
+                'gender' => "required",
+                'role' => "required",
+                'korda' => 'required|numeric',
+                'korwil' => 'required|numeric'
+            ])) {
+                echo json_encode(['error' => 1, 'message' => $this->validator->getErrors()]);
+                exit;
             }
         }
-        if (!$this->validate([
-            'name' => "required",
-            'email' => "required|valid_email|is_unique[users.email]",
-            'phone' => "required|is_unique[user_personal_informations.phone_number]",
-            'nik_ktp' => "is_unique[user_personal_informations.nik_ktp]",
-            
-            'gender' => "required",
-            'role' => "required",
-            'korda' => 'required|numeric',
-            'korwil' => 'required|numeric'
-        ])) {
-            echo json_encode(['error' => 1, 'message' => $this->validator->getErrors()]);
-            exit;
-        }
+
 
         // goto model
+
         $thmasuk = $this->request->getVar('tahunmasuk');
         $db      = \Config\Database::connect();
-
+        $mesg = "menambahkan";
+        $role_id = null;
+        if (is_nan((int)$this->request->getVar('role'))) {
+            // print_r('test');exit;
+            $role_id = $db->table('roles')->where('name', $this->request->getVar('role'))->get()->getRowObject()->id;
+        } else {
+            $role_id = (int)$this->request->getVar('role');
+        }
+        // print_r($this->request->getVar('role'));exit;
         try {
             $db->transBegin();
-            $builder = $db->table('users');
-            $builder->insert(array(
-                'name' => $this->request->getVar('name'),
-                'email' => $this->request->getVar('email'),
-                'password' => $this->request->getVar('password') != null ? password_hash($this->request->getVar('password'), PASSWORD_BCRYPT) : password_hash('1234567890', PASSWORD_BCRYPT),
-                'profile_photo_path' => $this->request->getVar('image')
-            ));
+            if ($data_id == null) {
+                $builder = $db->table('users');
+                $in = array(
+                    'name' => $this->request->getVar('name'),
+                    'email' => $this->request->getVar('email'),
+                    'password' => $this->request->getVar('password') != null ? password_hash($this->request->getVar('password'), PASSWORD_BCRYPT) : password_hash('1234567890', PASSWORD_BCRYPT),
 
-            $userid = $db->insertID();
-            $builder->resetQuery();
-            $builder = $db->table('model_has_roles');
-            $builder->insert(array(
-                'model_id' => $userid,
-                'model_type' => 'App\Models\User',
-                'role_id' => $this->request->getVar('role')
-            ));
+                );
+                if ($this->request->getVar('profile_photo_path') != null || $this->request->getVar('profile_photo_path') != "") {
+                    $in['profile_photo_path'] = $this->request->getVar('profile_photo_path');
+                }
+                $builder->insert($in);
 
-            $builder->resetQuery();
-            
-            $builder = $db->table('user_personal_informations');
-            $builder->insert(array(
-                'nik_ktp' => $this->request->getVar('nik'),
-                'user_id' => $userid,
-                'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
-                'gender' => $this->request->getVar('gender'),
-                'place_of_birth' => $this->request->getVar('place_of_birth'),
-                'date_of_birth' => $this->request->getVar('date_of_birth'),
-                'korda_id' => $this->request->getVar('korda'),
-                'korwil_id' => $this->request->getVar('korwil'),
-                'profile_image' => $this->request->getVar('image')                
-            ));
+                $userid = $db->insertID();
+                $builder->resetQuery();
+                $builder = $db->table('model_has_roles');
+                $builder->insert(array(
+                    'model_id' => $userid,
+                    'model_type' => 'App\Models\User',
+                    'role_id' => $role_id
+                ));
 
-            // TODO, INSERT ALAMAT
+                $builder = $db->table('user_personal_informations');
+                $inp = array(
+                    'nik_ktp' => $this->request->getVar('nik_ktp'),
+                    'user_id' => $userid,
+                    'phone_number' => $this->request->getVar('phone'),
+                    'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
+                    'gender' => $this->request->getVar('gender'),
+                    'place_of_birth' => $this->request->getVar('place_of_birth'),
+                    'date_of_birth' => $this->request->getVar('date_of_birth'),
+                    'korda_id' => $this->request->getVar('korda'),
+                    'korwil_id' => $this->request->getVar('korwil'),
+                    'profile_image' => $this->request->getVar('profile_image'),
+                    'clothes_size' => $this->request->getVar('clothes_size'),
+                    'company_name' => $this->request->getVar('company_name'),
+                    'siupsku_number' => $this->request->getVar('siupsku_number'),
+                    'siupsku_image' => $this->request->getVar('siupsku_image'),
+                    'clothes_size' => $this->request->getVar('clothes_size'),
+                    'garage_image' => $this->request->getVar('garage_image'),
+                    'passport_image' => $this->request->getVar('passport_image'),
+                    'area_dialing_code' => $this->request->getVar('area_dialing_code'),
+                );
+                if ($this->request->getVar('profile_image')  != null || $this->request->getVar('profile_image')  != "") {
+                    $inp['profile_image'] = $this->request->getVar('profile_image');
+                }
+                $builder->insert($inp);
+
+
+                $builder = $db->table('addresses');
+                $builder->insert(array(
+                    'addressable_type' => 'App\Models\User',
+                    'addressable_id' => $userid,
+                    'given_name' => $this->request->getVar('name'),
+                    'label' => 'DEFAULT',
+                    'country_code' => 'ID',
+                    'state' => $this->request->getVar('prov'),
+                    'city' => $this->request->getVar('city'),
+                    'street' => $this->request->getVar('subdistrict'),
+                    'latitude' => $this->request->getVar('latitude'),
+                    'longitude' => $this->request->getVar('longitude'),
+                    'is_primary' => 1,
+                    'full_address' => $this->request->getVar('address')
+                ));
+            } else {
+                $mesg = "mengupdate";
+                $builder = $db->table('users');
+                $in = array(
+                    'name' => $this->request->getVar('name'),
+                    'email' => $this->request->getVar('email')
+
+                );
+                if ($this->request->getVar('profile_photo_path') != null || $this->request->getVar('profile_photo_path') != "") {
+                    $in['profile_photo_path'] = $this->request->getVar('profile_photo_path');
+                }
+                $builder->where('id', $data_id)->update($in);
+
+                $builder->resetQuery();
+                $builder = $db->table('model_has_roles');
+                $builder->where('model_id', $data_id)->where('model_type', 'App\Models\User')->replace(array(
+                    'role_id' => $role_id
+                ));
+
+                $builder->resetQuery();
+
+                $builder = $db->table('user_personal_informations');
+                $inp = array(
+                    'nik_ktp' => $this->request->getVar('nik_ktp'),
+                    'phone_number' => $this->request->getVar('phone'),
+                    'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
+                    'gender' => $this->request->getVar('gender'),
+                    'place_of_birth' => $this->request->getVar('place_of_birth'),
+                    'date_of_birth' => $this->request->getVar('date_of_birth'),
+                    'korda_id' => $this->request->getVar('korda'),
+                    'korwil_id' => $this->request->getVar('korwil'),
+                    'profile_image' => $this->request->getVar('profile_image'),
+                    'clothes_size' => $this->request->getVar('clothes_size'),
+                    'company_name' => $this->request->getVar('company_name'),
+                    'siupsku_number' => $this->request->getVar('siupsku_number'),
+                    'siupsku_image' => $this->request->getVar('siupsku_image'),
+                    'clothes_size' => $this->request->getVar('clothes_size'),
+                    'garage_image' => $this->request->getVar('garage_image'),
+                    'passport_image' => $this->request->getVar('passport_image'),
+                    'area_dialing_code' => $this->request->getVar('area_dialing_code'),
+                );
+                $builder->where('user_id', $data_id)->update($inp);
+
+
+                $builder = $db->table('addresses');
+                $where = array(
+                    'addressable_type' => 'App\Models\User',
+                    'addressable_id' => $data_id,
+                );
+                $builder->where($where)->update(array(
+                    'given_name' => $this->request->getVar('name'),
+                    'label' => 'DEFAULT',
+                    'country_code' => 'ID',
+                    'state' => $this->request->getVar('prov'),
+                    'city' => $this->request->getVar('city'),
+                    'street' => $this->request->getVar('subistrict'),
+                    'latitude' => $this->request->getVar('latitude'),
+                    'longitude' => $this->request->getVar('longitude'),
+                    'is_primary' => 1,
+                    'full_address' => $this->request->getVar('address')
+                ));
+            }
 
             if ($db->transStatus() === false) {
                 $db->transRollback();
-                
             } else {
                 $db->transCommit();
-                echo json_encode(['error' => 0, 'message' => 'Berhasil menambahkan user!']);exit;
+                echo json_encode(['error' => 0, 'message' => 'Berhasil ' . $mesg . ' user!']);
+                exit;
             }
-            echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan user!', 'detail_error' => $db->error()]);
+            echo json_encode(['error' => 1, 'message' => 'Gagal ' . $mesg . ' user!', 'detail_error' => $db->error()]);
         } catch (\Exception $e) {
             echo json_encode(['error' => 1, 'message' => $e->getMessage()]);
         }
