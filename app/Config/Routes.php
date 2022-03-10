@@ -63,7 +63,10 @@ $routes->group('users', function ($routes) {
     $routes->post('update/(:num)', 'UsersController::update/$1');
     $routes->post('hapus/(:num)', 'UsersController::remove/$1');
     $routes->get('konfirmasi/(:any)', 'UsersController::confirmation/$1');
+    $routes->get('reset-password', 'UsersController::reset_password');
     $routes->get('(:any)', 'UsersController::index/$1');
+
+    
 });
 
 $routes->group('admins', function ($routes) {

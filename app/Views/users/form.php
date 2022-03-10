@@ -133,9 +133,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="row" id="retalinfo">
+                <div class="col-md-12 border-b">
+                        <h1 class="text-xl">Info Rental</h1>
+                    </div>
+                    <div class="col-md-12">
+                        
+                    </div>
+                </div>
                 <div class="row" id="addressinfo">
                     <div class="col-md-12 border-b">
-                        <h1 class="text-xl">Alamat</h1>
+                        <h1 class="text-xl">Alamat Rental</h1>
                     </div>
                     <div class="col-md-12">
                         <div class="row">
@@ -191,9 +199,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="retalinfo">
-
-                </div>
+               
             </form>
             <div class="row mt-10">
                 <!-- <div class="col-md-12">
@@ -228,7 +234,7 @@
 <script src="<?= base_url('js/maps.js') ?>"></script>
 <!-- master data (edit) -->
 <script>
-const data = <?= isset($data) ? json_encode($data) : null ?>;
+const datauser = <?= isset($data) ? json_encode($data) : null ?>;
 </script>
 <!-- Custom script for maps -->
 <script>
@@ -449,11 +455,6 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
         datePattern: ['Y']
     });
    $(document).ready(() => {
-    // $('.korwil').select2();
-    if(data != null && data.profile_photo_path != null && data.profile_photo_path != ""){
-        $("#profilephoto > div.dz-preview.dz-image-preview .dz-image").append(`<img src="https://auth.brnjuara.com/storage/${data.profile_photo_path}"`);    
-    }
-    
     $('.prov').select2({
         placeholder: "Tidak ada data provinsi!"
     });
@@ -466,6 +467,7 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
     $('.subdistrict').select2({
         placeholder: "Pilih kota/kab di atas!"
     });
+    
     $('.prov').select2({
         placeholder: 'Pilih provinsi!',
         ajax: {
@@ -484,6 +486,7 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
                 var dt = $.map(data.data, function(obj) {
                     obj.id = obj.id || obj.pk; // replace pk with your identifier
                     obj.text = obj.text || obj.region;
+                    // console.log(obj);
                     return obj;
                 });
                 // Transforms the top-level key of the response object from 'items' to 'results'
@@ -607,8 +610,12 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
                 var dt = $.map(data.data, function(obj) {
                     obj.id = obj.id || obj.pk; // replace pk with your identifier
                     obj.text = obj.text || obj.region;
+                    if(datauser!=null && datauser.korwil_id != null && parseInt(datauser.korwil_id) == parseInt(obj.id)){
+                        obj.selected = true;
+                    }
                     return obj;
                 });
+                // console.log(dt);
                 // Transforms the top-level key of the response object from 'items' to 'results'
                 return {
                     results: dt,
@@ -616,13 +623,6 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
                         more: (params.page * 10) < data.count_filtered
                     }
                 };
-            },
-            success: function(e){
-                console.log(e);
-                <?php if(isset($data) && $data->korda_id != null){ ?>
-                    console.log('data must be selected : <?= $data->korda_id ?>');
-                $('.korda').val(<?= $data->korda_id ?>).trigger('change');
-                <?php } ?>
             }
             // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
         }
@@ -662,6 +662,27 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
         });
     });
     });
+    if(datauser!=null && datauser.korwil_id != null){
+        var defaultKorwil = new Option(datauser.korwil_name, datauser.korwil_id, true, false);
+        $('.korda').append(defaultKorwil).trigger('change');
+    }
+    if(datauser!=null && datauser.korda_id != null){
+        var defaultKorda = new Option(datauser.korda_name, datauser.korda_id, true, false);
+        $('.korwil').append(defaultKorda).trigger('change');
+    }
+    if(datauser!=null && datauser.province != null){
+        var defaultProv = new Option(datauser.region, datauser.province, true, false);
+        $('.prov').append(defaultProv).trigger('change');
+    }
+    if(datauser!=null && datauser.city != null){
+        var defaultCity = new Option(datauser.area, datauser.city, true, false);
+        $('.city').append(defaultCity).trigger('change');
+    }
+    if(datauser!=null && datauser.subdistrict != null){
+        var defaultSub = new Option(datauser.subdistrict_name, datauser.subdistrict, true, false);
+        $('.subdistrict').append(defaultSub).trigger('change');
+    }
+    
     // $('.korwil').on('select2:select', function(e) {
     //     var data = e.params.data;
     //     additional.korwil = data.id;
@@ -750,7 +771,7 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
         }
         if (success) {
             Swal.fire({
-                title: 'Berhasil menambah data User!',
+                title: message,
                 text: "Tekan ok untuk kembali",
                 icon: 'success',
                 showCancelButton: true,
@@ -760,8 +781,10 @@ const data = <?= isset($data) ? json_encode($data) : null ?>;
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.history.back();
-                } else {
+                } else if(!result.isConfirmed) {
                     window.location.reload();
+                }else{
+                    return;
                 }
             });
         } else {

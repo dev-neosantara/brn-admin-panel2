@@ -245,6 +245,118 @@ class UsersController extends BaseAdmin
         exit;
     }
 
+    public function reset_password()
+    {
+        $sendto = $this->request->getVar('email');
+
+        $email = \Config\Services::email();
+
+        $config['protocol'] = 'smtp';
+        $config['SMTPHost'] = 'smtp.google.com';
+        $config['SMTPUser'] = 'renaldimedia@gmail.com';
+        $config['SMTPPass'] = 'Godlike123(!!)';
+        $config['SMTPPort'] = 587;
+        $config['SMTPCrypto'] = 'tls';
+        $config['mailType'] = 'html';
+        $config['DSN'] = true;
+
+        $email->initialize($config);
+
+        $email->setFrom('admin@brnjuara.com', 'Admin BRN');
+        $email->setTo($sendto);
+        // $email->setCC('another@another-example.com');
+        // $email->setBCC('them@their-example.com');
+
+        $email->setSubject('Permintaan Reset Password');
+        $email->setMessage('Testing the email class.');
+
+        $email->send(false);
+
+        print_r($email->printDebugger());
+        exit;
+    }
+
+    private function insertuser_personal($db, $return_id = false, $user_id = null)
+    {
+        // $db      = \Config\Database::connect();
+        $builder = $db->table('user_personal_informations');
+        $inp = array(
+            'nik_ktp' => $this->request->getVar('nik_ktp'),
+            'phone_number' => $this->request->getVar('phone'),
+            'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
+            'gender' => $this->request->getVar('gender'),
+            'place_of_birth' => $this->request->getVar('place_of_birth'),
+            'date_of_birth' => $this->request->getVar('date_of_birth'),
+            'korda_id' => $this->request->getVar('korda'),
+            'korwil_id' => $this->request->getVar('korwil'),
+            'profile_image' => $this->request->getVar('profile_image'),
+            'clothes_size' => $this->request->getVar('clothes_size'),
+            'company_name' => $this->request->getVar('company_name'),
+            'siupsku_number' => $this->request->getVar('siupsku_number'),
+            'siupsku_image' => $this->request->getVar('siupsku_image'),
+            'clothes_size' => $this->request->getVar('clothes_size'),
+            'garage_image' => $this->request->getVar('garage_image'),
+            'passport_image' => $this->request->getVar('passport_image'),
+            'area_dialing_code' => $this->request->getVar('area_dialing_code'),
+        );
+        if ($this->request->getVar('profile_image')  != null || $this->request->getVar('profile_image')  != "") {
+            $inp['profile_image'] = $this->request->getVar('profile_image');
+        }
+        $current = $builder->selectCount('user_id', 'usercount')->where('user_id', $user_id)->get()->getRow()->usercount;
+
+        if((int)$current == 0){
+            $inp['user_id'] = $user_id;
+            $x = $builder->insert($inp);
+            if($return_id){
+                return $db->insertID();
+            }
+            return $x;
+        }else{
+            return $db->table('user_personal_informations')->where('user_id', $user_id)->set($inp)->update();
+        }
+    }
+
+
+    private function insertuser_address($db, $return_id = false, $user_id = null)
+    {
+        $builder = $db->table('addresses');
+        $current = $builder->where('addressable_type', 'App\Models\User')->where('addressable_id', $user_id)->selectCount('addressable_id', 'usercount')->get()->getRow()->usercount;
+        $res = false;
+        if((int)$current == 0){
+            $res = $db->table('addresses')->insert(array(
+                'addressable_type' => 'App\Models\User',
+                'addressable_id' => $user_id,
+                'given_name' => $this->request->getVar('name'),
+                'label' => 'DEFAULT',
+                'country_code' => 'ID',
+                'state' => $this->request->getVar('prov'),
+                'city' => $this->request->getVar('city'),
+                'street' => $this->request->getVar('subdistrict'),
+                'latitude' => $this->request->getVar('latitude'),
+                'longitude' => $this->request->getVar('longitude'),
+                'is_primary' => 1,
+                'full_address' => $this->request->getVar('address')
+            ));
+            if($return_id){
+                return $db->insertID();
+            }
+        }else{
+            $res = $db->table('addresses')->where('addressable_type', 'App\Models\User')->where('addressable_id', $user_id)->set(array(
+                'given_name' => $this->request->getVar('name'),
+                'label' => 'DEFAULT',
+                'country_code' => 'ID',
+                'state' => $this->request->getVar('prov'),
+                'city' => $this->request->getVar('city'),
+                'street' => $this->request->getVar('subdistrict'),
+                'latitude' => $this->request->getVar('latitude'),
+                'longitude' => $this->request->getVar('longitude'),
+                'is_primary' => 1,
+                'full_address' => $this->request->getVar('address')
+            ))->update();
+        }
+        
+    }
+
     public function insertuser()
     {
         // print_r($_FILES);exit;
@@ -332,49 +444,48 @@ class UsersController extends BaseAdmin
                     'model_type' => 'App\Models\User',
                     'role_id' => $role_id
                 ));
-
-                $builder = $db->table('user_personal_informations');
-                $inp = array(
-                    'nik_ktp' => $this->request->getVar('nik_ktp'),
-                    'user_id' => $userid,
-                    'phone_number' => $this->request->getVar('phone'),
-                    'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
-                    'gender' => $this->request->getVar('gender'),
-                    'place_of_birth' => $this->request->getVar('place_of_birth'),
-                    'date_of_birth' => $this->request->getVar('date_of_birth'),
-                    'korda_id' => $this->request->getVar('korda'),
-                    'korwil_id' => $this->request->getVar('korwil'),
-                    'profile_image' => $this->request->getVar('profile_image'),
-                    'clothes_size' => $this->request->getVar('clothes_size'),
-                    'company_name' => $this->request->getVar('company_name'),
-                    'siupsku_number' => $this->request->getVar('siupsku_number'),
-                    'siupsku_image' => $this->request->getVar('siupsku_image'),
-                    'clothes_size' => $this->request->getVar('clothes_size'),
-                    'garage_image' => $this->request->getVar('garage_image'),
-                    'passport_image' => $this->request->getVar('passport_image'),
-                    'area_dialing_code' => $this->request->getVar('area_dialing_code'),
-                );
-                if ($this->request->getVar('profile_image')  != null || $this->request->getVar('profile_image')  != "") {
-                    $inp['profile_image'] = $this->request->getVar('profile_image');
-                }
-                $builder->insert($inp);
-
-
-                $builder = $db->table('addresses');
-                $builder->insert(array(
-                    'addressable_type' => 'App\Models\User',
-                    'addressable_id' => $userid,
-                    'given_name' => $this->request->getVar('name'),
-                    'label' => 'DEFAULT',
-                    'country_code' => 'ID',
-                    'state' => $this->request->getVar('prov'),
-                    'city' => $this->request->getVar('city'),
-                    'street' => $this->request->getVar('subdistrict'),
-                    'latitude' => $this->request->getVar('latitude'),
-                    'longitude' => $this->request->getVar('longitude'),
-                    'is_primary' => 1,
-                    'full_address' => $this->request->getVar('address')
-                ));
+                $upi = $this->insertuser_personal($db, false, $userid);
+                // $builder = $db->table('user_personal_informations');
+                // $inp = array(
+                //     'nik_ktp' => $this->request->getVar('nik_ktp'),
+                //     'user_id' => $userid,
+                //     'phone_number' => $this->request->getVar('phone'),
+                //     'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
+                //     'gender' => $this->request->getVar('gender'),
+                //     'place_of_birth' => $this->request->getVar('place_of_birth'),
+                //     'date_of_birth' => $this->request->getVar('date_of_birth'),
+                //     'korda_id' => $this->request->getVar('korda'),
+                //     'korwil_id' => $this->request->getVar('korwil'),
+                //     'profile_image' => $this->request->getVar('profile_image'),
+                //     'clothes_size' => $this->request->getVar('clothes_size'),
+                //     'company_name' => $this->request->getVar('company_name'),
+                //     'siupsku_number' => $this->request->getVar('siupsku_number'),
+                //     'siupsku_image' => $this->request->getVar('siupsku_image'),
+                //     'clothes_size' => $this->request->getVar('clothes_size'),
+                //     'garage_image' => $this->request->getVar('garage_image'),
+                //     'passport_image' => $this->request->getVar('passport_image'),
+                //     'area_dialing_code' => $this->request->getVar('area_dialing_code'),
+                // );
+                // if ($this->request->getVar('profile_image')  != null || $this->request->getVar('profile_image')  != "") {
+                //     $inp['profile_image'] = $this->request->getVar('profile_image');
+                // }
+                // $builder->insert($inp);
+                $adr = $this->insertuser_address($db, false, $userid);
+                // $builder = $db->table('addresses');
+                // $builder->insert(array(
+                //     'addressable_type' => 'App\Models\User',
+                //     'addressable_id' => $userid,
+                //     'given_name' => $this->request->getVar('name'),
+                //     'label' => 'DEFAULT',
+                //     'country_code' => 'ID',
+                //     'state' => $this->request->getVar('prov'),
+                //     'city' => $this->request->getVar('city'),
+                //     'street' => $this->request->getVar('subdistrict'),
+                //     'latitude' => $this->request->getVar('latitude'),
+                //     'longitude' => $this->request->getVar('longitude'),
+                //     'is_primary' => 1,
+                //     'full_address' => $this->request->getVar('address')
+                // ));
             } else {
                 $mesg = "mengupdate";
                 $builder = $db->table('users');
@@ -394,48 +505,8 @@ class UsersController extends BaseAdmin
                     'role_id' => $role_id
                 ));
 
-                $builder->resetQuery();
-
-                $builder = $db->table('user_personal_informations');
-                $inp = array(
-                    'nik_ktp' => $this->request->getVar('nik_ktp'),
-                    'phone_number' => $this->request->getVar('phone'),
-                    'id_card' => $this->request->getVar('id_card') != null ? $this->request->getVar('id_card') : "",
-                    'gender' => $this->request->getVar('gender'),
-                    'place_of_birth' => $this->request->getVar('place_of_birth'),
-                    'date_of_birth' => $this->request->getVar('date_of_birth'),
-                    'korda_id' => $this->request->getVar('korda'),
-                    'korwil_id' => $this->request->getVar('korwil'),
-                    'profile_image' => $this->request->getVar('profile_image'),
-                    'clothes_size' => $this->request->getVar('clothes_size'),
-                    'company_name' => $this->request->getVar('company_name'),
-                    'siupsku_number' => $this->request->getVar('siupsku_number'),
-                    'siupsku_image' => $this->request->getVar('siupsku_image'),
-                    'clothes_size' => $this->request->getVar('clothes_size'),
-                    'garage_image' => $this->request->getVar('garage_image'),
-                    'passport_image' => $this->request->getVar('passport_image'),
-                    'area_dialing_code' => $this->request->getVar('area_dialing_code'),
-                );
-                $builder->where('user_id', $data_id)->update($inp);
-
-
-                $builder = $db->table('addresses');
-                $where = array(
-                    'addressable_type' => 'App\Models\User',
-                    'addressable_id' => $data_id,
-                );
-                $builder->where($where)->update(array(
-                    'given_name' => $this->request->getVar('name'),
-                    'label' => 'DEFAULT',
-                    'country_code' => 'ID',
-                    'state' => $this->request->getVar('prov'),
-                    'city' => $this->request->getVar('city'),
-                    'street' => $this->request->getVar('subistrict'),
-                    'latitude' => $this->request->getVar('latitude'),
-                    'longitude' => $this->request->getVar('longitude'),
-                    'is_primary' => 1,
-                    'full_address' => $this->request->getVar('address')
-                ));
+                $upi = $this->insertuser_personal($db, false, $data_id);
+                $adr = $this->insertuser_address($db, false, $data_id);
             }
 
             if ($db->transStatus() === false) {
