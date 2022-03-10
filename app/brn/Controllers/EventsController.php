@@ -32,7 +32,9 @@ class EventsController extends \App\Controllers\BaseAdmin
         ];
         if($id != null){
             $data['data_id'] = $id;
+            $data['data'] = $db->table('agendas')->where('id', $id)->get()->getRow();
         }
+        // print_r($data);exit;
         echo view('Brn\Views\events\form', $data);
     }
 

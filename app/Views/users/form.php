@@ -38,14 +38,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="nik_ktp">NIK KTP</label>
-                                    <input type="text" data-validationurl="<?= base_url('extra/valid_nik') ?>" onblur="validation(this)" data-id="<?= isset($data_id) ? $data_id : '' ?>"class="form-control form-control-user" id="nik_ktp" tabindex="0" placeholder="Masukan nik ktp" name="nik_ktp" value="<?php echo isset($data) && property_exists($data, 'nik_ktp') ? $data->nik_ktp : '' ?>">
+                                    <input type="text" data-validationurl="<?= base_url('extra/valid_nik') ?>" onblur="validation(this)" data-id="<?= isset($data_id) ? $data_id : '' ?>" class="form-control form-control-user" id="nik_ktp" tabindex="0" placeholder="Masukan nik ktp" name="nik_ktp" value="<?php echo isset($data) && property_exists($data, 'nik_ktp') ? $data->nik_ktp : '' ?>">
                                     <span id="nik_ktp_errors" class="text-red-400"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="email">Email</label>
-                                    <input type="email" data-validationurl="<?= base_url('extra/valid_email')?>" data-id="<?= isset($data_id) ? $data_id : '' ?>" class="form-control form-control-user" id="email" tabindex="0" placeholder="email@domain.com" name="email" value="<?php echo isset($data) && property_exists($data, 'email') ? $data->email : '' ?>" onblur="validation(this)">
+                                    <input type="email" data-validationurl="<?= base_url('extra/valid_email') ?>" data-id="<?= isset($data_id) ? $data_id : '' ?>" class="form-control form-control-user" id="email" tabindex="0" placeholder="email@domain.com" name="email" value="<?php echo isset($data) && property_exists($data, 'email') ? $data->email : '' ?>" onblur="validation(this)">
                                     <span id="email_errors" class="text-red-400"></span>
                                 </div>
                             </div>
@@ -133,12 +133,19 @@
                         </div>
                     </div>
                 </div>
-                <div class="row" id="retalinfo">
-                <div class="col-md-12 border-b">
+                <div class="row" id="rentalinfo">
+                    <div class="col-md-12 border-b">
                         <h1 class="text-xl">Info Rental</h1>
                     </div>
                     <div class="col-md-12">
-                        
+                        <div class="form-group">
+                            <label for="company_name">Nama Rental</label>
+                            <input type="text" class="form-control form-control-user" id="company_name" placeholder="Nama Rental" tabindex="0" name="company_name" value="<?php echo isset($data) && property_exists($data, 'company_name') ? $data->company_name : '' ?>">
+                        </div>
+                        <div class="form-group">
+                            <label for="siupsku_number">Nomor Siupsku</label>
+                            <input type="text" class="form-control form-control-user" id="siupsku_number" placeholder="Nama Rental" tabindex="0" name="siupsku_number" value="<?php echo isset($data) && property_exists($data, 'company_name') ? $data->company_name : '' ?>">
+                        </div>
                     </div>
                 </div>
                 <div class="row" id="addressinfo">
@@ -199,8 +206,28 @@
                         </div>
                     </div>
                 </div>
-               
+
             </form>
+                <!-- <div class="row" id="additional">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="siupsku_image">Foto Siupsku</label>
+                            <form action="https://api.brnjuara.com/api/upload-files" method="post" class="dropzone" id="siupsku_image">
+                                
+                                <div class="dz-message" data-dz-message><span>Klik atau jatuhkan file foto SIUPSKU disini!</span></div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="garage_image">Foto Siupsku</label>
+                            <form action="https://api.brnjuara.com/api/upload-files" method="post" class="dropzone" id="garage_image">
+                               
+                                <div class="dz-message" data-dz-message><span>Klik atau jatuhkan file foto Garasi disini!</span></div>
+                            </form>
+                        </div>
+                    </div>
+                </div> -->
             <div class="row mt-10">
                 <!-- <div class="col-md-12">
                     <div class="form-group">
@@ -234,7 +261,7 @@
 <script src="<?= base_url('js/maps.js') ?>"></script>
 <!-- master data (edit) -->
 <script>
-const datauser = <?= isset($data) ? json_encode($data) : null ?>;
+    const datauser = <?= isset($data) ? json_encode($data) : null ?>;
 </script>
 <!-- Custom script for maps -->
 <script>
@@ -422,8 +449,6 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
 </script>
 
 <script>
-    
-    
     var additional = {
         korda: null,
         korwil: null,
@@ -454,108 +479,24 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
         delimiter: '-',
         datePattern: ['Y']
     });
-   $(document).ready(() => {
-    $('.prov').select2({
-        placeholder: "Tidak ada data provinsi!"
-    });
-     $('.korda').select2({
-        placeholder: "Tidak ada data korda!"
-    });
-    $('.city').select2({
-        placeholder: "Pilih provinsi di atas!"
-    });
-    $('.subdistrict').select2({
-        placeholder: "Pilih kota/kab di atas!"
-    });
-    
-    $('.prov').select2({
-        placeholder: 'Pilih provinsi!',
-        ajax: {
-            url: "<?= base_url('extra/regions') ?>",
-            dataType: 'json',
-            data: function(params) {
-                var query = {
-                    search: params.term,
-                    page: params.page || 1
-                }
-
-                // Query parameters will be ?search=[term]&page=[page]
-                return query;
-            },
-            processResults: function(data, params) {
-                var dt = $.map(data.data, function(obj) {
-                    obj.id = obj.id || obj.pk; // replace pk with your identifier
-                    obj.text = obj.text || obj.region;
-                    // console.log(obj);
-                    return obj;
-                });
-                // Transforms the top-level key of the response object from 'items' to 'results'
-                return {
-                    results: dt,
-                    pagination: {
-                        more: (params.page * 10) < data.count_filtered
-                    }
-                };
-            },
-            success: function(data) {
-                console.log(data.data);
-                if (data.data.length == 0) {
-                    $('.prov').select2({
-                        placeholder: "Tidak ada data provinsi!"
-                    });
-                }
-            }
-            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
-        }
-    });
-    $('.prov').on('select2:select', function(e) {
-        var data = e.params.data;
-        // additional.prov = data.id;
+    $(document).ready(() => {
+        $('.prov').select2({
+            placeholder: "Tidak ada data provinsi!"
+        });
+        $('.korda').select2({
+            placeholder: "Tidak ada data korda!"
+        });
         $('.city').select2({
-            ajax: {
-                url: "<?= base_url('extra/areas') ?>/" + data.id,
-                dataType: 'json',
-                data: function(params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-
-                    // Query parameters will be ?search=[term]&page=[page]
-                    return query;
-                },
-                processResults: function(data, params) {
-                    var dt = $.map(data.data, function(obj) {
-                        obj.id = obj.id || obj.pk; // replace pk with your identifier
-                        obj.text = obj.text || obj.area;
-                        return obj;
-                    });
-                    // Transforms the top-level key of the response object from 'items' to 'results'
-                    return {
-                        results: dt,
-                        pagination: {
-                            more: (params.page * 10) < data.count_filtered
-                        }
-                    };
-                },
-                success: function(data) {
-                    console.log(data.data);
-                    if (data.data.length == 0) {
-                        $('.city').select2({
-                            placeholder: "Tidak ada data kota/kab!"
-                        });
-                    }
-                }
-                // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
-            }
+            placeholder: "Pilih provinsi di atas!"
         });
-    });
-    $('.city').on('select2:select', function(e) {
-        var data = e.params.data;
-        // additional.kota = data.id;
         $('.subdistrict').select2({
+            placeholder: "Pilih kota/kab di atas!"
+        });
+
+        $('.prov').select2({
+            placeholder: 'Pilih provinsi!',
             ajax: {
-                url: "<?= base_url('extra/subdistrict') ?>/" + data.id,
+                url: "<?= base_url('extra/regions') ?>",
                 dataType: 'json',
                 data: function(params) {
                     var query = {
@@ -569,7 +510,8 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
                 processResults: function(data, params) {
                     var dt = $.map(data.data, function(obj) {
                         obj.id = obj.id || obj.pk; // replace pk with your identifier
-                        obj.text = obj.text || obj.subdistrict_name;
+                        obj.text = obj.text || obj.region;
+                        // console.log(obj);
                         return obj;
                     });
                     // Transforms the top-level key of the response object from 'items' to 'results'
@@ -583,56 +525,102 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
                 success: function(data) {
                     console.log(data.data);
                     if (data.data.length == 0) {
-                        $('.subdistrict').select2({
-                            placeholder: "Tidak ada data kecamatan!"
+                        $('.prov').select2({
+                            placeholder: "Tidak ada data provinsi!"
                         });
                     }
                 }
                 // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
             }
         });
-    });
-    $('.korda').select2({
-        placeholder: 'Pilih ',
-        ajax: {
-            url: "<?= base_url('extra/regions/1').(isset($data) && $data->korda_id != null ? '?id='.$data->korda_id : '') ?>",
-            dataType: 'json',
-            data: function(params) {
-                var query = {
-                    search: params.term,
-                    page: params.page || 1
-                }
+        $('.prov').on('select2:select', function(e) {
+            var data = e.params.data;
+            // additional.prov = data.id;
+            $('.city').select2({
+                ajax: {
+                    url: "<?= base_url('extra/areas') ?>/" + data.id,
+                    dataType: 'json',
+                    data: function(params) {
+                        var query = {
+                            search: params.term,
+                            page: params.page || 1
+                        }
 
-                // Query parameters will be ?search=[term]&page=[page]
-                return query;
-            },
-            processResults: function(data, params) {
-                var dt = $.map(data.data, function(obj) {
-                    obj.id = obj.id || obj.pk; // replace pk with your identifier
-                    obj.text = obj.text || obj.region;
-                    if(datauser!=null && datauser.korwil_id != null && parseInt(datauser.korwil_id) == parseInt(obj.id)){
-                        obj.selected = true;
+                        // Query parameters will be ?search=[term]&page=[page]
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        var dt = $.map(data.data, function(obj) {
+                            obj.id = obj.id || obj.pk; // replace pk with your identifier
+                            obj.text = obj.text || obj.area;
+                            return obj;
+                        });
+                        // Transforms the top-level key of the response object from 'items' to 'results'
+                        return {
+                            results: dt,
+                            pagination: {
+                                more: (params.page * 10) < data.count_filtered
+                            }
+                        };
+                    },
+                    success: function(data) {
+                        console.log(data.data);
+                        if (data.data.length == 0) {
+                            $('.city').select2({
+                                placeholder: "Tidak ada data kota/kab!"
+                            });
+                        }
                     }
-                    return obj;
-                });
-                // console.log(dt);
-                // Transforms the top-level key of the response object from 'items' to 'results'
-                return {
-                    results: dt,
-                    pagination: {
-                        more: (params.page * 10) < data.count_filtered
+                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                }
+            });
+        });
+        $('.city').on('select2:select', function(e) {
+            var data = e.params.data;
+            // additional.kota = data.id;
+            $('.subdistrict').select2({
+                ajax: {
+                    url: "<?= base_url('extra/subdistrict') ?>/" + data.id,
+                    dataType: 'json',
+                    data: function(params) {
+                        var query = {
+                            search: params.term,
+                            page: params.page || 1
+                        }
+
+                        // Query parameters will be ?search=[term]&page=[page]
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        var dt = $.map(data.data, function(obj) {
+                            obj.id = obj.id || obj.pk; // replace pk with your identifier
+                            obj.text = obj.text || obj.subdistrict_name;
+                            return obj;
+                        });
+                        // Transforms the top-level key of the response object from 'items' to 'results'
+                        return {
+                            results: dt,
+                            pagination: {
+                                more: (params.page * 10) < data.count_filtered
+                            }
+                        };
+                    },
+                    success: function(data) {
+                        console.log(data.data);
+                        if (data.data.length == 0) {
+                            $('.subdistrict').select2({
+                                placeholder: "Tidak ada data kecamatan!"
+                            });
+                        }
                     }
-                };
-            }
-            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
-        }
-    });
-    $('.korda').on('select2:select', function(e) {
-        var data = e.params.data;
-        // additional.korda = data.id;
-        $('.korwil').select2({
+                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                }
+            });
+        });
+        $('.korda').select2({
+            placeholder: 'Pilih ',
             ajax: {
-                url: "<?= base_url('extra/areas') ?>/" + data.id + "/1",
+                url: "<?= base_url('extra/regions/1') . (isset($data) && $data->korda_id != null ? '?id=' . $data->korda_id : '') ?>",
                 dataType: 'json',
                 data: function(params) {
                     var query = {
@@ -646,9 +634,13 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
                 processResults: function(data, params) {
                     var dt = $.map(data.data, function(obj) {
                         obj.id = obj.id || obj.pk; // replace pk with your identifier
-                        obj.text = obj.text || obj.area;
+                        obj.text = obj.text || obj.region;
+                        if (datauser != null && datauser.korwil_id != null && parseInt(datauser.korwil_id) == parseInt(obj.id)) {
+                            obj.selected = true;
+                        }
                         return obj;
                     });
+                    // console.log(dt);
                     // Transforms the top-level key of the response object from 'items' to 'results'
                     return {
                         results: dt,
@@ -660,29 +652,62 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
                 // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
             }
         });
+        $('.korda').on('select2:select', function(e) {
+            var data = e.params.data;
+            // additional.korda = data.id;
+            $('.korwil').select2({
+                ajax: {
+                    url: "<?= base_url('extra/areas') ?>/" + data.id + "/1",
+                    dataType: 'json',
+                    data: function(params) {
+                        var query = {
+                            search: params.term,
+                            page: params.page || 1
+                        }
+
+                        // Query parameters will be ?search=[term]&page=[page]
+                        return query;
+                    },
+                    processResults: function(data, params) {
+                        var dt = $.map(data.data, function(obj) {
+                            obj.id = obj.id || obj.pk; // replace pk with your identifier
+                            obj.text = obj.text || obj.area;
+                            return obj;
+                        });
+                        // Transforms the top-level key of the response object from 'items' to 'results'
+                        return {
+                            results: dt,
+                            pagination: {
+                                more: (params.page * 10) < data.count_filtered
+                            }
+                        };
+                    }
+                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                }
+            });
+        });
     });
-    });
-    if(datauser!=null && datauser.korwil_id != null){
+    if (datauser != null && datauser.korwil_id != null) {
         var defaultKorwil = new Option(datauser.korwil_name, datauser.korwil_id, true, false);
         $('.korda').append(defaultKorwil).trigger('change');
     }
-    if(datauser!=null && datauser.korda_id != null){
+    if (datauser != null && datauser.korda_id != null) {
         var defaultKorda = new Option(datauser.korda_name, datauser.korda_id, true, false);
         $('.korwil').append(defaultKorda).trigger('change');
     }
-    if(datauser!=null && datauser.province != null){
+    if (datauser != null && datauser.province != null) {
         var defaultProv = new Option(datauser.region, datauser.province, true, false);
         $('.prov').append(defaultProv).trigger('change');
     }
-    if(datauser!=null && datauser.city != null){
+    if (datauser != null && datauser.city != null) {
         var defaultCity = new Option(datauser.area, datauser.city, true, false);
         $('.city').append(defaultCity).trigger('change');
     }
-    if(datauser!=null && datauser.subdistrict != null){
+    if (datauser != null && datauser.subdistrict != null) {
         var defaultSub = new Option(datauser.subdistrict_name, datauser.subdistrict, true, false);
         $('.subdistrict').append(defaultSub).trigger('change');
     }
-    
+
     // $('.korwil').on('select2:select', function(e) {
     //     var data = e.params.data;
     //     additional.korwil = data.id;
@@ -709,7 +734,7 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
             toValue: function(date, format, language) {
                 var d = new Date(date);
                 // d.setDate(d.getDate());
-                return d.getFullYear() + "-" + (d.getMonth()+1) + "-" + d.getDate();
+                return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
             }
         }
     });
@@ -727,7 +752,7 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
         additional.city = document.querySelector("#city").value;
         additional.subdistrict = document.querySelector("#subdistrict").value;
         additional.date_of_birth = db.getFullYear() + "-" + (db.getMonth() + 1) + "-" + db.getDate();
-        
+
         if (image != "") {
             params['profile_photo_path'] = image;
             params['profile_image'] = image;
@@ -781,9 +806,9 @@ const datauser = <?= isset($data) ? json_encode($data) : null ?>;
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.history.back();
-                } else if(!result.isConfirmed) {
+                } else if (!result.isConfirmed) {
                     window.location.reload();
-                }else{
+                } else {
                     return;
                 }
             });

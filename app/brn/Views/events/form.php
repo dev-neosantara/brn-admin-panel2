@@ -31,9 +31,9 @@
                         <label for="type">Tipe Acara</label>
                         <select name="type" id="type" class="form-control form-control-user">
                             <option value="">Pilih Tipe Acara!</option>
-                            <option value="hut">Acara HUT</option>
-                            <option value="kopdar">Acara Kopdar</option>
-                            <option value="tour">Acara Tour</option>
+                            <option value="hut" <?php echo isset($data) && isset($data->type) && $data->type == 'HUT' ? 'selected' : '' ?>>Acara HUT</option>
+                            <option value="kopdar" <?php echo isset($data) && isset($data->type) && $data->type == 'KOPDAR' ? 'selected' : '' ?>>Acara Kopdar</option>
+                            <option value="tour" <?php echo isset($data) && isset($data->type) && $data->type == 'TOUR' ? 'selected' : '' ?>>Acara Tour</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -132,8 +132,9 @@
 <!-- <script src="https://cdn.ckeditor.com/4.17.1/standard-all/ckeditor.js"></script> -->
 <!-- <script src="<?= base_url() ?>/lib/ckeditor/ckeditor.js"></script> -->
 <script>
-    var lat = 108.495;
-    var lng = -6.888;
+    const dataevent = <?= isset($data) ? json_encode($data) : null ?>;
+    var lng = <?= isset($data) && $data->latitude != "" && $data->latitude != null ? $data->latitude : 108.495 ?>;
+    var lat = <?= isset($data) && $data->longitude != "" && $data->longitude != null ? $data->longitude : -6.888 ?>;
     var map = L.map('map').setView([lng, lat], 8);
     var marker = new L.Marker(map.getCenter());
 
@@ -155,10 +156,10 @@
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }).addTo(map);
 
-    const search = new GeoSearch.GeoSearchControl({
-        provider: new GeoSearch.OpenStreetMapProvider(),
-    });
-    map.addControl(search);
+    // const search = new GeoSearch.GeoSearchControl({
+    //     provider: new GeoSearch.OpenStreetMapProvider(),
+    // });
+    // map.addControl(search);
     map.on('click', mapClick);
 
     function mapClick(e) {
@@ -230,6 +231,10 @@
             }
         });
     });
+    if (dataevent != null && dataevent.korwil_id != null) {
+        var defaultProv = new Option(datauser.korwil_name, datauser.korwil_id, true, false);
+        $('#prov').append(defaultKorwil).trigger('change');
+    }
 </script>
 <script>
     var image = "";
