@@ -40,128 +40,166 @@ class Extra extends ResourceController
     }
 
 
-    public function get_regions($is_registered = false)
+    public function get_regions()
     {
-        
+
         // print_r($this->request->getVar());exit;
-        
+
         $page = $this->request->getVar('page');
         $term = $this->request->getVar('term');
+        $is_registered = $this->request->getVar('is_registered');
         // $page = $this->request->getVar('page');
         $q = $this->db->table('regions');
         $selected_id = $this->request->getVar('id');
-        if($selected_id != null ){
+        if ($selected_id != null) {
             $q = $q->whereNotIn('id', [$selected_id]);
         }
-        if($is_registered){
-            $q = $q->where('is_registered', 1);
+        if ($is_registered != null) {
+            $q = $q->where('is_registered', $is_registered);
         }
-        if($page && $page > 0){
-            $q = $q->limit(20, $page-1);
+        if ($page && $page > 0) {
+            $q = $q->limit(20, $page - 1);
         }
-        if($term && $term != ''){
+        if ($term && $term != '') {
             $q = $q->like('region', $term, 'both');
         }
 
 
-        $data = $q->get()->getResult();
-        
+        $data = $q->get()->getResultArray();
+
         $selected = array();
-        if($selected_id != null){
+        if ($selected_id != null) {
             $selected = $this->db->table('regions')->where('id', $selected_id)->get()->getRowArray();
         }
-        if(isset($selected['id'])){
-            $data = (array)$data;
-            // print_r($data[0]);exit;
-            $data[] = (array)$selected;
-            // $data = array_unique($data);
-            $data = (object)$data;
+        // print_r($selected);exit;
+        if (isset($selected['id'])) {
+            $selected['selected'] = 1;
+            $data[] = $selected;
         }
+
+        // print_r($data);exit;
+        $res = [];
+        foreach ($data as $d) {
+            $x = array(
+                'id' => $d['id'],
+                'text' => $d['region'],
+                'selected' => isset($d['selected']) ? $d['selected'] : 0
+            );
+            $res[] = $x;
+        }
+
         return $this->respond(array(
             'error' => 0,
             'message' => '',
-            'data' => $data
-        ),200);exit;
+            'data' => (object)$res
+        ), 200);
+        exit;
     }
-    public function get_areas($region_id, $is_registered = false)
+    public function get_areas()
     {
         // print_r($this->request->getVar());exit;
         $page = $this->request->getVar('page');
         $term = $this->request->getVar('term');
+        $region_id = $this->request->getVar('region_id');
+        $is_registered = $this->request->getVar('is_registered');
 
         $q = $this->db->table('areas')->where('region_id', $region_id);
         $selected_id = $this->request->getVar('id');
-        if($selected_id != null ){
+        if ($selected_id != null) {
             $q = $q->whereNotIn('id', [$selected_id]);
         }
-        if($is_registered){
-            $q = $q->where('is_registered', 1);
+        if ($is_registered != null) {
+            $q = $q->where('is_registered', $is_registered);
         }
 
-        if($page && $page > 0){
-            $q = $q->limit(20, $page-1);
+        if ($page && $page > 0) {
+            $q = $q->limit(20, $page - 1);
         }
-        if($term && $term != ''){
+        if ($term && $term != '') {
             $q = $q->like('area', $term, 'both');
         }
 
 
-        $data = $q->get()->getResult();
+        $data = $q->get()->getResultArray();
         $selected = array();
-        if($selected_id != null){
+        if ($selected_id != null) {
             $selected = $this->db->table('areas')->where('id', $selected_id)->get()->getRowArray();
         }
-        if(isset($selected['id'])){
-            $data = (array)$data;
+        // print_r($selected);exit;
+        if (isset($selected['id'])) {
+            $selected['selected'] = 1;
             $data[] = $selected;
-            $data = array_unique($data);
-            $data = (object)$data;
+        }
+
+        // print_r($data);exit;
+        $res = [];
+        foreach ($data as $d) {
+            $x = array(
+                'id' => $d['id'],
+                'text' => $d['area'],
+                'selected' => isset($d['selected']) ? $d['selected'] : 0
+            );
+            $res[] = $x;
         }
         return $this->respond(array(
             'error' => 0,
             'message' => '',
-            'data' => $data
-        ),200);exit;
+            'data' => (object)$res
+        ), 200);
+        exit;
     }
     public function get_subdistrict($area_id, $is_registered = false)
     {
+        $area_id = $this->request->getVar('area_id');
+        $is_registered = $this->request->getVar('is_registered');
         // print_r($this->request->getVar());exit;
         $page = $this->request->getVar('page');
         $term = $this->request->getVar('term');
 
         $q = $this->db->table('subdistrict')->where('area_id', $area_id);
         $selected_id = $this->request->getVar('id');
-        if($selected_id != null ){
+        if ($selected_id != null) {
             $q = $q->whereNotIn('id', [$selected_id]);
         }
-        if($is_registered){
-            $q = $q->where('is_registered', 1);
+        if ($is_registered != null) {
+            $q = $q->where('is_registered', $is_registered);
         }
 
-        if($page && $page > 0){
-            $q = $q->limit(20, $page-1);
+        if ($page && $page > 0) {
+            $q = $q->limit(20, $page - 1);
         }
-        if($term && $term != ''){
+        if ($term && $term != '') {
             $q = $q->like('subdistrict_name', $term, 'both');
         }
 
 
-        $data = $q->get()->getResult();
+        $data = $q->get()->getResultArray();
         $selected = array();
-        if($selected_id != null){
+        if ($selected_id != null) {
             $selected = $this->db->table('subdistrict')->where('id', $selected_id)->get()->getRowArray();
         }
-        if(isset($selected['id'])){
-            $data = (array)$data;
+        // print_r($selected);exit;
+        if (isset($selected['id'])) {
+            $selected['selected'] = 1;
             $data[] = $selected;
-            $data = array_unique($data);
-            $data = (object)$data;
+        }
+
+        // print_r($data);exit;
+        $res = [];
+        foreach ($data as $d) {
+            $x = array(
+                'id' => $d['id'],
+                'text' => $d['subdistrict_name'],
+                'selected' => isset($d['selected']) ? $d['selected'] : 0
+            );
+            $res[] = $x;
         }
         return $this->respond(array(
             'error' => 0,
             'message' => '',
-            'data' => $data
-        ),200);exit;
+            'data' => $res
+        ), 200);
+        exit;
     }
 
     public function valid_email($id = null)

@@ -54,9 +54,12 @@ $routes->group('events', ['namespace' => 'Brn\Controllers'], function ($routes) 
     $routes->get('list', 'EventsController::listajax', ['as' => 'list_event_ajax']);
     $routes->get('add', 'EventsController::form', ['as' => 'add_event']);
     $routes->get('edit/(:num)', 'EventsController::form/$1');
+    $routes->get('detail/(:num)', 'EventController::index/$1');
+    $routes->get('detailajax/(:num)', 'EventController::listajax/$1');
     $routes->get('hapus/(:num)', 'EventsController::delete/$1');
     $routes->post('insert', 'EventsController::insert', ['as' => 'insert_event']);
     $routes->post('update', 'EventsController::insert', ['as' => 'update_event']);
+
 });
 
 /*

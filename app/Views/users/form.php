@@ -261,7 +261,12 @@
 <script src="<?= base_url('js/maps.js') ?>"></script>
 <!-- master data (edit) -->
 <script>
-    const datauser = <?= isset($data) ? json_encode($data) : null ?>;
+    
+    <?php if(isset($data)){ ?>
+        const datauser = <?= json_encode($data) ?>;
+    <?php }else{ ?>
+        var datauser;
+    <?php } ?>
 </script>
 <!-- Custom script for maps -->
 <script>
@@ -457,7 +462,7 @@
         subdistrict: null,
         phone: null,
         date_of_birth: null,
-        data_id: <?= isset($data_id) ? $data_id : "" ?>
+        data_id: null
     }
     const baseUrl = "<?= base_url('users') ?>";
     const role = "<?= isset($role) ? $role : (isset($data) && property_exists($data, 'role') ? $data->role : '') ?>";
@@ -480,9 +485,9 @@
         datePattern: ['Y']
     });
     $(document).ready(() => {
-        $('.prov').select2({
-            placeholder: "Tidak ada data provinsi!"
-        });
+        // $('.prov').select2({
+        //     placeholder: "Tidak ada data provinsi!"
+        // });
         $('.korda').select2({
             placeholder: "Tidak ada data korda!"
         });
@@ -493,87 +498,47 @@
             placeholder: "Pilih kota/kab di atas!"
         });
 
-        $('.prov').select2({
-            placeholder: 'Pilih provinsi!',
-            ajax: {
-                url: "<?= base_url('extra/regions') ?>",
-                dataType: 'json',
-                data: function(params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
-
-                    // Query parameters will be ?search=[term]&page=[page]
-                    return query;
-                },
-                processResults: function(data, params) {
-                    var dt = $.map(data.data, function(obj) {
-                        obj.id = obj.id || obj.pk; // replace pk with your identifier
-                        obj.text = obj.text || obj.region;
-                        // console.log(obj);
-                        return obj;
-                    });
-                    // Transforms the top-level key of the response object from 'items' to 'results'
-                    return {
-                        results: dt,
-                        pagination: {
-                            more: (params.page * 10) < data.count_filtered
-                        }
-                    };
-                },
-                success: function(data) {
-                    console.log(data.data);
-                    if (data.data.length == 0) {
-                        $('.prov').select2({
-                            placeholder: "Tidak ada data provinsi!"
-                        });
-                    }
-                }
-                // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
-            }
+        var provparams = {};
+        if(datauser != null && datauser.state != null){
+            provparams['id'] = datauser.state;
+        }
+       
+        // var prov = getRegions(provparams);
+        getRegions(provparams).then((res) => {
+            // console.log(res.data.data);
+            // let datas = res.data.data;
+            console.log(res.data.data);
+            $('.prov').select2({
+                placeholder: 'Pilih provinsi!',
+                data: res.data.data
+            });
         });
+        var cityparams = {};
+        if(datauser != null && datauser.state != null){
+            cityparams['region_id'] = datauser.state;
+        }
+        if(datauser != null && datauser.city != null){
+            cityparams['id'] = datauser.city;
+        }
+        
+        
         $('.prov').on('select2:select', function(e) {
             var data = e.params.data;
-            // additional.prov = data.id;
-            $('.city').select2({
-                ajax: {
-                    url: "<?= base_url('extra/areas') ?>/" + data.id,
-                    dataType: 'json',
-                    data: function(params) {
-                        var query = {
-                            search: params.term,
-                            page: params.page || 1
-                        }
-
-                        // Query parameters will be ?search=[term]&page=[page]
-                        return query;
-                    },
-                    processResults: function(data, params) {
-                        var dt = $.map(data.data, function(obj) {
-                            obj.id = obj.id || obj.pk; // replace pk with your identifier
-                            obj.text = obj.text || obj.area;
-                            return obj;
-                        });
-                        // Transforms the top-level key of the response object from 'items' to 'results'
-                        return {
-                            results: dt,
-                            pagination: {
-                                more: (params.page * 10) < data.count_filtered
-                            }
-                        };
-                    },
-                    success: function(data) {
-                        console.log(data.data);
-                        if (data.data.length == 0) {
-                            $('.city').select2({
-                                placeholder: "Tidak ada data kota/kab!"
-                            });
-                        }
-                    }
-                    // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+            cityparams['region_id'] = data;
+            getAreas(cityparams).then((res) => {
+                if(res.length > 0){
+                    $('.city').select2({
+                        placeholder: "Pilih Kota/Kab!",
+                        data: res.data.data
+                    });
+                }else{
+                    $('.city').select2({
+                        placeholder: "Tidak ada kota/kab untuk provinsi ini!"
+                    });
                 }
+                
             });
+            
         });
         $('.city').on('select2:select', function(e) {
             var data = e.params.data;
@@ -620,7 +585,7 @@
         $('.korda').select2({
             placeholder: 'Pilih ',
             ajax: {
-                url: "<?= base_url('extra/regions/1') . (isset($data) && $data->korda_id != null ? '?id=' . $data->korda_id : '') ?>",
+                url: "<?= base_url('extra/regions') .'?'. (isset($data) && $data->korda_id != null ? 'id=' . $data->korda_id.'&' : '') . 'is_registered=1' ?>",
                 dataType: 'json',
                 data: function(params) {
                     var query = {
@@ -695,18 +660,18 @@
         var defaultKorda = new Option(datauser.korda_name, datauser.korda_id, true, false);
         $('.korwil').append(defaultKorda).trigger('change');
     }
-    if (datauser != null && datauser.province != null) {
-        var defaultProv = new Option(datauser.region, datauser.province, true, false);
-        $('.prov').append(defaultProv).trigger('change');
-    }
-    if (datauser != null && datauser.city != null) {
-        var defaultCity = new Option(datauser.area, datauser.city, true, false);
-        $('.city').append(defaultCity).trigger('change');
-    }
-    if (datauser != null && datauser.subdistrict != null) {
-        var defaultSub = new Option(datauser.subdistrict_name, datauser.subdistrict, true, false);
-        $('.subdistrict').append(defaultSub).trigger('change');
-    }
+    // if (datauser != null && datauser.province != null) {
+    //     var defaultProv = new Option(datauser.region, datauser.province, true, false);
+    //     $('.prov').append(defaultProv).trigger('change');
+    // }
+    // if (datauser != null && datauser.city != null) {
+    //     var defaultCity = new Option(datauser.area, datauser.city, true, false);
+    //     $('.city').append(defaultCity).trigger('change');
+    // }
+    // if (datauser != null && datauser.subdistrict != null) {
+    //     var defaultSub = new Option(datauser.subdistrict_name, datauser.subdistrict, true, false);
+    //     $('.subdistrict').append(defaultSub).trigger('change');
+    // }
 
     // $('.korwil').on('select2:select', function(e) {
     //     var data = e.params.data;
@@ -759,6 +724,9 @@
         }
         <?php if (isset($role)) { ?>
             params['role'] = '<?= $role ?>'
+        <?php } ?>
+        <?php if (isset($data_id)) { ?>
+            additional['data_id'] = '<?= $data_id ?>'
         <?php } ?>
 
         params = params.reduce(function(obj, item) {

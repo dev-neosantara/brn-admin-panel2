@@ -38,12 +38,9 @@ $routes->get('/imagerender', 'RenderImage::index');
 $routes->post('/imagerender', 'RenderImage::index');
 
 $routes->group('extra', function ($routes) {
-    $routes->get('regions/(:num)', 'Extra::get_regions/$1');
-    $routes->get('areas/(:num)/(:num)', 'Extra::get_areas/$1/$2');
-    $routes->get('subdistrict/(:num)/(:num)', 'Extra::get_subdistrict/$1/$2');
     $routes->get('regions', 'Extra::get_regions');
-    $routes->get('areas/(:num)', 'Extra::get_areas/$1');
-    $routes->get('subdistrict/(:num)', 'Extra::get_subdistrict/$1');
+    $routes->get('areas', 'Extra::get_areas');
+    $routes->get('subdistrict', 'Extra::get_subdistrict');
 });
 
 $routes->group('users', function ($routes) {

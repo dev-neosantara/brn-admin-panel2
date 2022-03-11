@@ -211,7 +211,21 @@
                     })
                 });
         }
-        
+        async function getRegions(params){
+            let urls = "<?= base_url('extra/regions') ?>";
+            let x = await axios.get(urls, params);
+            return x;
+        }
+        async function getAreas(params){
+            let urls = "<?= base_url('extra/areas') ?>";
+            let x = await axios.get(urls, params);
+            return x;
+        }
+        async function getSubdistrict(params){
+            let urls = "<?= base_url('extra/subdistrict') ?>";
+            let x = await axios.get(urls, params);
+            return x;
+        }
     </script>
     <?= $this->renderSection('foot') ?>
 
