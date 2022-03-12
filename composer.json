@@ -25,7 +25,8 @@
             "Config\\": "app/Config",
             "Olshop\\": "app/olshop",
             "Blog\\": "app/blog",
-            "Brn\\": "app/brn"
+            "Brn\\": "app/brn",
+            "Courses\\": "app/courses"
          },
         "exclude-from-classmap": [
             "**/Database/Migrations/**"

@@ -108,6 +108,9 @@
     <!-- <script src="<?= base_url() . '/node_modules/axios/dist/axios.min.js' ?>"></script> -->
 
     <script>
+        const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni",
+            "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        ];
         const uploaderFile = function(target, url) {
             // Get the template HTML and remove it from the doument.
             let previewNode = document.querySelector("#template");
@@ -182,10 +185,10 @@
             }
             let params = {};
             params[key] = value;
-            if(id != null && id != ""){
+            if (id != null && id != "") {
                 params['id'] = id;
             }
-            
+
             axios.post(url, params)
                 .then(function(response) {
                     // console.log(response.data);
@@ -211,17 +214,17 @@
                     })
                 });
         }
-        async function getRegions(params){
+        async function getRegions(params) {
             let urls = "<?= base_url('extra/regions') ?>";
             let x = await axios.get(urls, params);
             return x;
         }
-        async function getAreas(params){
+        async function getAreas(params) {
             let urls = "<?= base_url('extra/areas') ?>";
             let x = await axios.get(urls, params);
             return x;
         }
-        async function getSubdistrict(params){
+        async function getSubdistrict(params) {
             let urls = "<?= base_url('extra/subdistrict') ?>";
             let x = await axios.get(urls, params);
             return x;

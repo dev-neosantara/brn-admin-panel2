@@ -214,6 +214,21 @@
         Data Mobil
     </div>
 
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item <?php echo $_SESSION['currentpath'] == 'cars' ? 'active' : '' ?>">
+        <a class="nav-link" href="<?= base_url('cars') ?>">
+            <i class="fas fa-car"></i>
+            <span>Daftar Mobil Member</span>
+        </a>
+    </li>
+    <!-- Nav Item - Dashboard -->
+    <li class="nav-item <?php echo $_SESSION['currentpath'] == 'car/models' ? 'active' : '' ?>">
+        <a class="nav-link" href="<?= base_url('cars/models') ?>">
+            <i class="fas fa-car"></i>
+            <span>Daftar Pabrikan Member</span>
+        </a>
+    </li>
+
     <!-- Divider -->
     <hr class="sidebar-divider d-none d-md-block">
 

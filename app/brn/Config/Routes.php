@@ -61,6 +61,32 @@ $routes->group('events', ['namespace' => 'Brn\Controllers'], function ($routes) 
     $routes->post('update', 'EventsController::insert', ['as' => 'update_event']);
 
 });
+$routes->group('diklat', ['namespace' => 'Brn\Controllers'], function ($routes) {
+    $routes->get('/', 'DiklatsController::index');
+    $routes->get('list', 'DiklatsController::listajax', ['as' => 'list_diklat_ajax']);
+    $routes->get('add', 'DiklatsController::form', ['as' => 'add_diklat']);
+    $routes->get('edit/(:num)', 'DiklatsController::form/$1');
+    $routes->get('detail/(:num)', 'DiklatsController::index/$1');
+    $routes->get('detailajax/(:num)', 'DiklatsController::listajax/$1');
+    $routes->get('hapus/(:num)', 'DiklatsController::delete/$1');
+    $routes->post('insert', 'DiklatsController::insert', ['as' => 'insert_diklat']);
+    $routes->post('update', 'DiklatsController::insert', ['as' => 'update_diklat']);
+
+    $routes->group('users', ['namespace' => 'Brn\Controllers'], function ($routes) {
+        $routes->get('/', 'DiklatUsersController::index');
+    });
+});
+$routes->group('cars', ['namespace' => 'Brn\Controllers'], function ($routes) {
+    $routes->get('/', 'CarsController::index');
+    $routes->get('list', 'CarsController::listajax', ['as' => 'list_car_ajax']);
+    $routes->get('add', 'CarsController::form', ['as' => 'add_car']);
+    $routes->get('edit/(:num)', 'CarsController::form/$1');
+    $routes->get('detail/(:num)', 'CarsController::index/$1');
+    $routes->get('detailajax/(:num)', 'CarsController::listajax/$1');
+    $routes->get('hapus/(:num)', 'CarsController::delete/$1');
+    $routes->post('insert', 'CarsController::insert', ['as' => 'insert_car']);
+    $routes->post('update', 'CarsController::insert', ['as' => 'update_car']);
+});
 
 /*
  * --------------------------------------------------------------------
