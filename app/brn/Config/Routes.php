@@ -81,6 +81,7 @@ $routes->group('cars', ['namespace' => 'Brn\Controllers'], function ($routes) {
     $routes->get('list', 'CarsController::listajax', ['as' => 'list_car_ajax']);
     $routes->get('add', 'CarsController::form', ['as' => 'add_car']);
     $routes->get('edit/(:num)', 'CarsController::form/$1');
+    $routes->get('images', 'CarsController::listimageajax');
     $routes->get('detail/(:num)', 'CarsController::index/$1');
     $routes->get('detailajax/(:num)', 'CarsController::listajax/$1');
     $routes->get('hapus/(:num)', 'CarsController::delete/$1');

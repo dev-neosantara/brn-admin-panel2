@@ -20,6 +20,18 @@ class CarsController extends \App\Controllers\BaseAdmin
         echo view('Brn\Views\cars\list');
     }
 
+    public function listimageajax()
+    {
+        $id = $this->request->getVar('id');
+
+        $db = \Config\Database::connect();
+
+        $data['data'] = $db->table('car_images')->where('car_id', $id)->get()->getResult();
+        $data['error'] = 0;
+
+        echo json_encode($data);exit;
+    }
+
     public function listajax()
     {
         $db = \Config\Database::connect();
@@ -43,7 +55,7 @@ class CarsController extends \App\Controllers\BaseAdmin
         ccl.color,
         korw.region,
         kord.area,
-        crp.status, cars.status, crp.id')->join('users as u', 'cars.user_id = u.id', 'left')->join('car_fuels as cf', 'cars.car_fuel_id = cf.id', 'left')->join('car_makes as cm', 'cars.car_make_id = cm.id', 'left')->join('car_models as cmd', 'cars.car_model_id = cmd.id', 'left')->join('car_colors as ccl', 'cars.car_color_id = ccl.id', 'left')->join('car_types as ct', 'cars.car_type_id = ct.class', 'left')->join('user_personal_informations as upi', 'u.id = upi.user_id', 'left')->join('regions as korw', 'korw.id = upi.korwil_id', 'left')->join('areas as kord', 'kord.id = upi.korda_id', 'left')->join('case_reports as crp', 'cars.id = crp.car_id', 'left');
+        crp.status, cars.status, crp.id, cars.id as car_id')->join('users as u', 'cars.user_id = u.id', 'left')->join('car_fuels as cf', 'cars.car_fuel_id = cf.id', 'left')->join('car_makes as cm', 'cars.car_make_id = cm.id', 'left')->join('car_models as cmd', 'cars.car_model_id = cmd.id', 'left')->join('car_colors as ccl', 'cars.car_color_id = ccl.id', 'left')->join('car_types as ct', 'cars.car_type_id = ct.class', 'left')->join('user_personal_informations as upi', 'u.id = upi.user_id', 'left')->join('regions as korw', 'korw.id = upi.korwil_id', 'left')->join('areas as kord', 'kord.id = upi.korda_id', 'left')->join('case_reports as crp', 'cars.id = crp.car_id', 'left');
         return DataTable::of($builder)
             ->setSearchableColumns(['u.name', 'u.email', 'upi.phone_number', 'upi.id_card', 'upi.nik'])
             ->filter(function ($builder, $request) {

@@ -14,6 +14,11 @@
                             href="https://datatables.net">official DataTables documentation</a>.</p> -->
 
 <!-- DataTales Example -->
+<!-- <div class="flex justify-center space-x-4">
+<img src="https://picsum.photos/200/300" class="h-62" alt="img1">
+<img src="https://picsum.photos/200/300" class="h-62" alt="img2">
+<img src="https://picsum.photos/200/300" class="h-62" alt="img3">
+</div> -->
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <h6 class="m-0 font-weight-bold text-primary">Data Mobil</h6>
@@ -59,16 +64,11 @@
     const API_BASE_URL = "https://api.brnjuara.com/storage";
     $(document).ready(function() {
         $('#carsTable').DataTable({
-            dom: 'lBfrtip',
+            dom: 'lfrtip',
             processing: true,
             serverSide: true,
             order: [], //init datatable not ordering
             ajax: "<?php echo site_url('cars/list') ?>",
-            buttons: {
-                buttons: [
-                    `<a href="<?= route_to('add_cars') ?>" class="border bg-blue-500 text-white px-2 py-1 rounded-md flex space-x-2"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg><span>Tambah Data Pelaku</span></a>`
-                ]
-            },
             columnDefs: [{
                     targets: 0,
                     orderable: false
@@ -124,12 +124,12 @@
                                     break;
                                 default:
                                     break;
-                            } 
+                            }
                             res += `<p>${full[20] == 'lost' ? "Hilang" : "Aktif"}</p>`;
-                            if(cases != "" && full[21] != null){
+                            if (cases != "" && full[21] != null) {
                                 res += `<p>${cases} <a href="#" class="underline">Lihat Data Kasus</a></p>`;
                             }
-                            
+
                         }
                         return res;
                     }
@@ -140,7 +140,7 @@
                         let res = "";
                         if (type === 'display') {
                             res += `<a target="_blank" href="#" class="flex space-x-1 items-center underline"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Foto STNK</a>`;
-                            res += `<a target="_blank" href="#" class="flex space-x-1 items-center underline"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Foto Mobil</a>`;
+                            res += `<a href="#" onclick="showImages(${full[22]})" class="flex space-x-1 items-center underline"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg> Foto Mobil</a>`;
                         }
                         return res;
                     }
@@ -150,7 +150,7 @@
                     render: function(data, type, full, meta) {
                         let res = "";
                         if (type === 'display') {
-                            res += `<a href="#" onclick="deletepro(${full[5]})" class="px-2 flex space-x-2 border rounded-lg bg-red-400 text-center text-white justify-center items-center py-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Hapus</a>`;
+                            res += `<a href="#" onclick="deletepro(${full[22]})" class="px-2 flex space-x-2 border rounded-lg bg-red-400 text-center text-white justify-center items-center py-1"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>Hapus</a>`;
                         }
                         return res;
                     }
@@ -163,6 +163,49 @@
             console.log(message);
         };
     });
+
+    function showImages(id) {
+        fetch("<?= base_url('cars/images?id=') ?>" + id)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error == 0) {
+                    let images = "";
+                    let title = "";
+                    
+//                     <div class="flex justify-center space-x-4">
+//         <img src="" class="h-62">
+// </div>
+                    if(data.data.length > 0){
+                        images += `<div class="flex justify-center space-x-4">`;
+                        data.data.forEach(element => {
+                            images += `<img src="https://api.brnjuara.com/storage/${element.image}" onerror="this.src='https://media.istockphoto.com/vectors/no-image-available-icon-vector-id1216251206?k=6&m=1216251206&s=612x612&w=0&h=G8kmMKxZlh7WyeYtlIHJDxP5XRGm9ZXyLprtVJKxd-o='" class="h-62">`;
+                        });
+                        images += "</div>";
+                        title = "Daftar Gambar Mobil";
+                    }else{
+                        images = "<b>Tidak ada gambar mobil!</b>";
+                        title = "Tidak ada gambar tersedia";
+                    }
+                    Swal.fire({
+                        title: title,
+                        icon: 'info',
+                        html: images,
+                        showCloseButton: true,
+                        showCancelButton: true,
+                        focusConfirm: false,
+                        confirmButtonText: 'Tutup',
+                    })
+                }else{
+                    Swal.fire(
+                    'Error!',
+                    data.message,
+                    'error'
+                );
+                }
+                
+            });
+
+    }
 
     function publish(name, id) {
         const url = "<?= base_url('olshop/product/publish') ?>/" + id;
