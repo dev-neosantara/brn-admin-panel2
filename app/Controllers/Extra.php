@@ -159,7 +159,7 @@ class Extra extends ResourceController
         ), 200);
         exit;
     }
-    public function get_subdistrict($area_id, $is_registered = false)
+    public function get_subdistrict()
     {
         $area_id = $this->request->getVar('area_id');
         $is_registered = $this->request->getVar('is_registered');

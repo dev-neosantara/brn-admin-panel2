@@ -501,6 +501,7 @@
         var subdsparams = {};
         if (datauser != null && datauser.subdistrict != null) {
             subsdsparams['id'] = datauser.subdistrict;
+            subdsparams['area_id'] = datauser.city;
             getSubdistrict(subdsparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.subdistrict').select2({
@@ -566,8 +567,8 @@
         $('.city').on('select2:select', function(e) {
             var data = e.params.data;
             // additional.kota = data.id;
-
-            subsdsparams['area_id'] = parseInt(data.id);
+            
+            subdsparams['area_id'] = parseInt(data.id);
             getSubdistrict(subdsparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.subdistrict').select2({
