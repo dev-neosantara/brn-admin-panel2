@@ -48,6 +48,7 @@ $routes->group('blog', ['namespace' => 'Blog\Controllers'], function ($routes) {
     $routes->get('categories', 'Article::categories');
     $routes->get('category/delete/(:num)', 'Article::deletecat/$1');
     $routes->post('article/insert', 'Article::addarticle', ['as' => 'insert_article']);
+    $routes->post('article/upload/(:any)', 'Article::uploadimg/$1');
 });
 
 /*

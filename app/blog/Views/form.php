@@ -30,7 +30,7 @@
                 <?php } ?>
                 <div class="col-md-12">
                     <label for="">Foto Cover</label>
-                    <form action="<?= base_url('/blog/article/insert') ?>" method="post" class="dropzone" id="pdimg">
+                    <form action="<?= base_url('/blog/article/upload/json') ?>" method="post" class="dropzone" id="pdimg">
                         <!-- <div id="pdimg"></div> -->
                         <div class="dz-message" data-dz-message><span>Klik atau jatuhkan file foto Artikel disini!</span></div>
                     </form>
@@ -74,7 +74,7 @@
         var params = {
             title: $('#title').val(),
             content: contentdata.getEditor().getData(),
-            category: 0,
+            category: 1,
             status: $('#is_published').val() == 'on' ? "published" : "draft",
             image: image,
             data_id: null
@@ -83,7 +83,7 @@
             params['data_id'] = <?= $data_id ?>;
             <?php } ?>
         // console.log(params);return;
-        var urls = "<?= base_url('sponsors/insert') ?>";
+        var urls = "<?= base_url('blog/article/insert') ?>";
         axios.post(urls, params)
             .then(function(response) {
                 if (response.data.error == 0) {
@@ -95,7 +95,7 @@
 
             })
             .catch(function(error) {
-                image = images;
+                // image = images;
                 console.log(error);
                 successins(false, error);
             });
@@ -112,8 +112,9 @@
             }
         },
         success: function(response) {
-            console.log(response);
-            image = response.data.file_paths[0];
+            // console.log();
+            let data = JSON.parse(response.xhr.responseText);
+            image = data.images[0];
             sendapi();
         },
         error: function() {

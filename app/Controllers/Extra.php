@@ -66,19 +66,24 @@ class Extra extends ResourceController
 
 
         $data = $q->get()->getResultArray();
+        $res = [];
+        if (count($data) > 0) {
+            $selected = array();
 
-        $selected = array();
-        if ($selected_id != null) {
-            $selected = $this->db->table('regions')->where('id', $selected_id)->get()->getRowArray();
-        }
-        // print_r($selected);exit;
-        if (isset($selected['id'])) {
-            $selected['selected'] = 1;
-            $data[] = $selected;
+            if ($selected_id != null) {
+                $selected = $this->db->table('regions')->where('id', $selected_id)->get()->getRowArray();
+            }
+            // print_r($selected);exit;
+            if (isset($selected['id'])) {
+                $selected['selected'] = 1;
+                $data[] = $selected;
+            } else {
+                $res[] = array('id' => "", 'text' => "Pilih " . ($is_registered == 1 ? "Korwil" : "Provinsi"), 'selected' => 1);
+            }
         }
 
         // print_r($data);exit;
-        $res = [];
+
         foreach ($data as $d) {
             $x = array(
                 'id' => $d['id'],
@@ -91,7 +96,7 @@ class Extra extends ResourceController
         return $this->respond(array(
             'error' => 0,
             'message' => '',
-            'data' => (object)$res
+            'data' => $res
         ), 200);
         exit;
     }
@@ -121,18 +126,24 @@ class Extra extends ResourceController
 
 
         $data = $q->get()->getResultArray();
-        $selected = array();
-        if ($selected_id != null) {
-            $selected = $this->db->table('areas')->where('id', $selected_id)->get()->getRowArray();
-        }
-        // print_r($selected);exit;
-        if (isset($selected['id'])) {
-            $selected['selected'] = 1;
-            $data[] = $selected;
+        $res = [];
+        if (count($data) > 0) {
+            $selected = array();
+            if ($selected_id != null) {
+                $selected = $this->db->table('areas')->where('id', $selected_id)->get()->getRowArray();
+            }
+            // print_r($selected);exit;
+            if (isset($selected['id'])) {
+                $selected['selected'] = 1;
+                $data[] = $selected;
+            } else {
+                $res[] = array('id' => "", 'text' => "Pilih " . ($is_registered == 1 ? "Korda" : "Kota/Kab"), 'selected' => 1);
+            }
         }
 
+
         // print_r($data);exit;
-        $res = [];
+
         foreach ($data as $d) {
             $x = array(
                 'id' => $d['id'],
@@ -144,7 +155,7 @@ class Extra extends ResourceController
         return $this->respond(array(
             'error' => 0,
             'message' => '',
-            'data' => (object)$res
+            'data' => $res
         ), 200);
         exit;
     }
@@ -174,18 +185,25 @@ class Extra extends ResourceController
 
 
         $data = $q->get()->getResultArray();
-        $selected = array();
-        if ($selected_id != null) {
-            $selected = $this->db->table('subdistrict')->where('id', $selected_id)->get()->getRowArray();
-        }
-        // print_r($selected);exit;
-        if (isset($selected['id'])) {
-            $selected['selected'] = 1;
-            $data[] = $selected;
+        $res = [];
+        if (count($data) > 0) {
+            $selected = array();
+
+            if ($selected_id != null) {
+                $selected = $this->db->table('subdistrict')->where('id', $selected_id)->get()->getRowArray();
+            }
+            // print_r($selected);exit;
+            if (isset($selected['id'])) {
+                $selected['selected'] = 1;
+                $data[] = $selected;
+            } else {
+                $res[] = array('id' => "", 'text' => "Pilih Kecamatan", 'selected' => 1);
+            }
         }
 
+
         // print_r($data);exit;
-        $res = [];
+
         foreach ($data as $d) {
             $x = array(
                 'id' => $d['id'],

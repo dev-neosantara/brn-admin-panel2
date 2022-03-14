@@ -24,10 +24,10 @@ class Article extends \App\Controllers\BaseAdmin
     public function publish($id)
     {
         $db = \Config\Database::connect();
-        $cat = $db->table('articles')->select('articles.*')->where('id', $id)->get()->getRowArray();
+        $cat = $db->table('articles')->select('articles.*')->where('id', $id)->get()->getResultArray();
         $msg = 'Publish';
         if (count($cat) > 0) {
-
+            $cat = $cat[0];
             $set = array(
                 'status' => 'published'
             );
@@ -61,7 +61,7 @@ class Article extends \App\Controllers\BaseAdmin
     {
         $db = \Config\Database::connect();
 
-        $builder = $db->table('articles')->select('articles.title, users.email, articles.status, articles.id')->join('users', 'articles.user_id = users.id');
+        $builder = $db->table('articles')->select('articles.title, users.email, articles.status, articles.id')->join('users', 'articles.user_id = users.id', 'left');
         return DataTable::of($builder)
             ->setSearchableColumns(['title', 'email'])
             ->addNumbering() //it will return data output with numbering on first column
@@ -227,31 +227,34 @@ class Article extends \App\Controllers\BaseAdmin
             $msg = 'menambahkan';
             if ($this->request->getVar('data_id') != null) {
                 $builder->update(array(
-                    'title' => $this->request->getPost('title'),
-                    'content' => $this->request->getPost('content'),
-                    'image' => (count($img) == 0) ? '' : $img[0],
-                    'status' => $this->request->getPost('status'),
-                    'slug' => $this->sluggable($this->request->getPost('title'))
+                    'title' => $this->request->getVar('title'),
+                    'content' => $this->request->getVar('content'),
+                    'image' => $img,
+                    'status' => $this->request->getVar('status'),
+                    'slug' => $this->sluggable($this->request->getVar('title'))
                 ), array('id' => $this->request->getVar('data_id')));
                 $builder = $db->table('categorizables');
                 $builder->update(array(
-                    'category_id' => $this->request->getPost('category')
+                    'category_id' => $this->request->getVar('category')
                 ), array('categorizable_id' => $this->request->getVar('data_id'), 'categorizable_type' => 'App\Models\Article'));
             }else{
                 $builder->insert(array(
-                    'title' => $this->request->getPost('title'),
-                    'content' => $this->request->getPost('content'),
-                    'image' => (count($img) == 0) ? '' : $img[0],
-                    'status' => $this->request->getPost('status'),
-                    'slug' => $this->sluggable($this->request->getPost('title'))
+                    'title' => $this->request->getVar('title'),
+                    'content' => $this->request->getVar('content'),
+                    'image' => $img,
+                    'status' => $this->request->getVar('status'),
+                    'slug' => $this->sluggable($this->request->getVar('title'))
                 ));
                 $idcat = $db->insertID();
-                $builder = $db->table('categorizables');
-                $builder->insert(array(
-                    'category_id' => $this->request->getPost('category'),
-                    'categorizable_id' => $idcat,
-                    'categorizable_type' => 'App\Models\Article'
-                ));
+                if($this->request->getVar('category') != null){
+                    $builder = $db->table('categorizables');
+                    $builder->insert(array(
+                        'category_id' => $this->request->getVar('category'),
+                        'categorizable_id' => $idcat,
+                        'categorizable_type' => 'App\Models\Article'
+                    ));
+                }
+               
             }
            
 
@@ -269,7 +272,7 @@ class Article extends \App\Controllers\BaseAdmin
         return ['error' => 1, 'message' => 'Gagal '.$msg.' data artikel!'];
     }
 
-    public function uploadimg()
+    public function uploadimg($return = null)
     {
         $files = $this->request->getFiles();
         $res = [];
@@ -285,6 +288,10 @@ class Article extends \App\Controllers\BaseAdmin
                 echo json_encode(['error' => 1, 'message' => 'Tidak dapat mengupload gambar!']);
                 exit;
             }
+        }
+        if($return == 'json'){
+            echo json_encode(['error' => 0, 'message' => 'OK', 'images' => $res]);
+            exit;
         }
         return $res;
     }

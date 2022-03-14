@@ -39,7 +39,7 @@ $routes->group('course', ['namespace' => 'Courses\Controllers'], function ($rout
     $routes->post('insert', 'CoursesController::insert', ['as' => 'insert_course']);
     $routes->post('update', 'CoursesController::insert', ['as' => 'update_course']);
 
-    $routes->group('users', ['namespace' => 'Brn\Controllers'], function ($routes) {
+    $routes->group('users', ['namespace' => 'Courses\Controllers'], function ($routes) {
         $routes->get('/', 'CourseUsersController::index');
     });
 });
