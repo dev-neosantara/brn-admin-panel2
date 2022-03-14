@@ -110,7 +110,7 @@
                                     <?php if (isset($roles)) {
                                         foreach ($roles as $rol) :
                                     ?>
-                                            <option value="<?= $rol->id; ?>" data-name="<?= $rol->name; ?>" <?= isset($role) && $role == $rol->name || (isset($data) && property_exists($data, 'role') && $rol->name == $data->role) ? 'selected' : '' ?>><?= $rol->display_name == '' ? $rol->name : $rol->display_name; ?></option>
+                                            <option value="<?= $rol->name; ?>" data-name="<?= $rol->name; ?>" <?= isset($role) && $role == $rol->name || (isset($data) && property_exists($data, 'role') && $rol->name == $data->role) ? 'selected' : '' ?>><?= $rol->display_name == '' ? $rol->name : $rol->display_name; ?></option>
                                     <?php endforeach;
                                     } ?>
                                 </select>
@@ -461,7 +461,7 @@
         subdistrict: null,
         phone: null,
         date_of_birth: null,
-        data_id: null
+        data_id: null, role: null
     }
     const baseUrl = "<?= base_url('users') ?>";
     const role = "<?= isset($role) ? $role : (isset($data) && property_exists($data, 'role') ? $data->role : '') ?>";
@@ -704,7 +704,11 @@
             params['profile_image'] = image;
         }
         <?php if (isset($role)) { ?>
-            params['role'] = '<?= $role ?>'
+            if(params.hasOwnProperty('role')){
+                params['role'] = params['role'] != null ? params['role'] : role;
+            }
+            additional['role'] = role
+            
         <?php } ?>
         <?php if (isset($data_id)) { ?>
             additional['data_id'] = '<?= $data_id ?>'

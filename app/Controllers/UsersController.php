@@ -304,14 +304,14 @@ class UsersController extends BaseAdmin
         }
         $current = $builder->selectCount('user_id', 'usercount')->where('user_id', $user_id)->get()->getRow()->usercount;
 
-        if((int)$current == 0){
+        if ((int)$current == 0) {
             $inp['user_id'] = $user_id;
             $x = $builder->insert($inp);
-            if($return_id){
+            if ($return_id) {
                 return $db->insertID();
             }
             return $x;
-        }else{
+        } else {
             return $db->table('user_personal_informations')->where('user_id', $user_id)->set($inp)->update();
         }
     }
@@ -322,7 +322,7 @@ class UsersController extends BaseAdmin
         $builder = $db->table('addresses');
         $current = $builder->where('addressable_type', 'App\Models\User')->where('addressable_id', $user_id)->selectCount('addressable_id', 'usercount')->get()->getRow()->usercount;
         $res = false;
-        if((int)$current == 0){
+        if ((int)$current == 0) {
             $res = $db->table('addresses')->insert(array(
                 'addressable_type' => 'App\Models\User',
                 'addressable_id' => $user_id,
@@ -337,10 +337,10 @@ class UsersController extends BaseAdmin
                 'is_primary' => 1,
                 'full_address' => $this->request->getVar('address')
             ));
-            if($return_id){
+            if ($return_id) {
                 return $db->insertID();
             }
-        }else{
+        } else {
             $res = $db->table('addresses')->where('addressable_type', 'App\Models\User')->where('addressable_id', $user_id)->set(array(
                 'given_name' => $this->request->getVar('name'),
                 'label' => 'DEFAULT',
@@ -354,7 +354,6 @@ class UsersController extends BaseAdmin
                 'full_address' => $this->request->getVar('address')
             ))->update();
         }
-        
     }
 
     public function insertuser()
@@ -372,8 +371,8 @@ class UsersController extends BaseAdmin
             if (!$this->validate([
                 'name' => "required",
                 'email' => "required|valid_email|is_unique[users.email]",
-                'phone' => "required|is_unique[user_personal_informations.phone_numbe]",
-                'nik_ktp' => "is_unique[user_personal_informations.nik_kt]",
+                'phone' => "required|is_unique[user_personal_informations.phone_number]",
+                'nik_ktp' => "is_unique[user_personal_informations.nik_ktp]",
 
                 'gender' => "required",
                 'role' => "required",
@@ -414,7 +413,8 @@ class UsersController extends BaseAdmin
         $db      = \Config\Database::connect();
         $mesg = "menambahkan";
         $role_id = null;
-        if (is_nan((int)$this->request->getVar('role'))) {
+        // print_r((int)$this->request->getVar('role'));exit;
+        if (is_nan((int)$this->request->getVar('role')) || (int)$this->request->getVar('role') == 0) {
             // print_r('test');exit;
             $role_id = $db->table('roles')->where('name', $this->request->getVar('role'))->get()->getRowObject()->id;
         } else {
@@ -438,6 +438,7 @@ class UsersController extends BaseAdmin
 
                 $userid = $db->insertID();
                 $builder->resetQuery();
+                // print_r($role_id);exit;
                 $builder = $db->table('model_has_roles');
                 $builder->insert(array(
                     'model_id' => $userid,
@@ -579,7 +580,7 @@ class UsersController extends BaseAdmin
     {
         $db = \Config\Database::connect();
 
-        $builder = $db->table('users as u')->select('u.name, u.email, p.id_card, u.id, u.payment_status as payment, u.check_korda as vkorda, u.check_korwil as vkorwil, count(mr.model_id), u.points, u.status')->join('user_personal_informations as p', 'u.id = p.user_id', 'left')->join('point_user pu', 'u.id = pu.user_id', 'left')->groupBy('pu.user_id');
+        $builder = $db->table('users as u')->select('u.name, u.email, p.id_card, u.id, u.payment_status as payment, u.check_korda as vkorda, u.check_korwil as vkorwil, count(mr.model_id), u.points, u.status')->join('user_personal_informations as p', 'u.id = p.user_id', 'left')->join('point_user pu', 'u.id = pu.user_id', 'left')->groupBy('pu.user_id')->orderBy('u.name', 'ASC');
         if ($role != null) {
             $builder->join('model_has_roles as mr', 'u.id = mr.model_id', 'left')->join('roles as r', 'mr.role_id = r.id', 'left');
             if ($role == 'new') {
