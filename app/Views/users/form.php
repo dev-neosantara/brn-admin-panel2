@@ -530,7 +530,7 @@
             cityparams['region_id'] = datauser.state;
         }
         if (datauser != null && datauser.city != null) {
-            cityparams['id'] = datauser.city;
+            cityparams['id'] = parseInt(datauser.city);
             getAreas(cityparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.city').select2({
@@ -547,7 +547,7 @@
         }
         $('.prov').on('select2:select', function(e) {
             var data = e.params.data;
-            cityparams['region_id'] = data;
+            cityparams['region_id'] = parseInt(data.id);
             getAreas(cityparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.city').select2({
@@ -567,7 +567,7 @@
             var data = e.params.data;
             // additional.kota = data.id;
 
-            subsdsparams['area_id'] = data;
+            subsdsparams['area_id'] = parseInt(data.id);
             getSubdistrict(subdsparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.subdistrict').select2({
@@ -588,7 +588,7 @@
             korwilparams['id'] = datauser.korwil_id;
         }
         var kordaparams = {};
-        kordaparams['is_regitered'] = 1;
+        kordaparams['is_registered'] = 1;
         if (datauser != null && datauser.korda_id != null) {
             kordaparams['id'] = datauser.korda_id;
         }
@@ -607,12 +607,13 @@
             }
         })
         $('.korwil').select2({
-                        placeholder: "Pilih wilayah administrasi di atas!"
-                    });
+            placeholder: "Pilih wilayah administrasi di atas!"
+        });
         $('.korda').on('select2:select', function(e) {
             var data = e.params.data;
-            kordaparams['region_id'] = data;
+            kordaparams['region_id'] = parseInt(data.id);
             // additional.korda = data.id;
+            console.log(kordaparams);
             getAreas(kordaparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.korwil').select2({
@@ -627,9 +628,9 @@
             });
         });
 
-        
 
-        
+
+
     });
     // if (datauser != null && datauser.korwil_id != null) {
     //     var defaultKorwil = new Option(datauser.korwil_name, datauser.korwil_id, true, false);
