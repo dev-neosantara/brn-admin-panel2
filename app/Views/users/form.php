@@ -144,7 +144,7 @@
                         </div>
                         <div class="form-group">
                             <label for="siupsku_number">Nomor Siupsku</label>
-                            <input type="text" class="form-control form-control-user" id="siupsku_number" placeholder="Nama Rental" tabindex="0" name="siupsku_number" value="<?php echo isset($data) && property_exists($data, 'company_name') ? $data->company_name : '' ?>">
+                            <input type="text" class="form-control form-control-user" id="siupsku_number" placeholder="No SIUPSKU" tabindex="0" name="siupsku_number" value="<?php echo isset($data) && property_exists($data, 'company_name') ? $data->company_name : '' ?>">
                         </div>
                     </div>
                 </div>
@@ -484,9 +484,7 @@
         datePattern: ['Y']
     });
     $(document).ready(() => {
-        // $('.prov').select2({
-        //     placeholder: "Tidak ada data provinsi!"
-        // });
+        
         $('.korda').select2({
             placeholder: "Tidak ada data korda!"
         });
@@ -500,7 +498,7 @@
         var provparams = {};
         var subdsparams = {};
         if (datauser != null && datauser.subdistrict != null) {
-            subsdsparams['id'] = datauser.subdistrict;
+            subdsparams['id'] = datauser.subdistrict;
             subdsparams['area_id'] = datauser.city;
             getSubdistrict(subdsparams).then((res) => {
                 if (res.data.data.length > 0) {
@@ -515,8 +513,8 @@
                 }
             })
         }
-        if (datauser != null && datauser.state != null) {
-            provparams['id'] = datauser.state;
+        if (datauser != null && datauser.province != null) {
+            provparams['id'] = datauser.province;
         }
 
         // var prov = getRegions(provparams);
@@ -527,11 +525,12 @@
             });
         });
         var cityparams = {};
-        if (datauser != null && datauser.state != null) {
-            cityparams['region_id'] = datauser.state;
+        if (datauser != null && datauser.province != null) {
+            cityparams['region_id'] = datauser.province;
         }
         if (datauser != null && datauser.city != null) {
             cityparams['id'] = parseInt(datauser.city);
+            // console.log(datauser.state);
             getAreas(cityparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.city').select2({
@@ -543,12 +542,10 @@
                         placeholder: "Tidak ada kota/kab untuk provinsi ini!"
                     });
                 }
-
             });
         }
-        $('.prov').on('select2:select', function(e) {
-            var data = e.params.data;
-            cityparams['region_id'] = parseInt(data.id);
+        $('.prov').on('change.select2', function(e) {
+            cityparams['region_id'] = this.value;
             getAreas(cityparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.city').select2({
@@ -560,15 +557,10 @@
                         placeholder: "Tidak ada kota/kab untuk provinsi ini!"
                     });
                 }
-
             });
-
         });
-        $('.city').on('select2:select', function(e) {
-            var data = e.params.data;
-            // additional.kota = data.id;
-            
-            subdsparams['area_id'] = parseInt(data.id);
+        $('.city').on('change.select2', function(e) {
+            subdsparams['area_id'] = this.value;
             getSubdistrict(subdsparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.subdistrict').select2({
@@ -584,15 +576,13 @@
 
         });
         var korwilparams = {}
-        korwilparams['is_registerd'] = 1;
+        korwilparams['is_registered'] = 1;
         if (datauser != null && datauser.korwil_id != null) {
             korwilparams['id'] = datauser.korwil_id;
         }
         var kordaparams = {};
         kordaparams['is_registered'] = 1;
-        if (datauser != null && datauser.korda_id != null) {
-            kordaparams['id'] = datauser.korda_id;
-        }
+        
 
         getRegions(korwilparams).then((res) => {
             // console.log(res.data.data);
@@ -610,11 +600,26 @@
         $('.korwil').select2({
             placeholder: "Pilih wilayah administrasi di atas!"
         });
-        $('.korda').on('select2:select', function(e) {
-            var data = e.params.data;
-            kordaparams['region_id'] = parseInt(data.id);
+        if (datauser != null && datauser.korda_id != null) {
+            kordaparams['id'] = datauser.korda_id;
+            kordaparams['region_id'] = datauser.korwil_id;
+            getAreas(kordaparams).then((res) => {
+                if (res.data.data.length > 0) {
+                    $('.korwil').select2({
+                        placeholder: "Pilih Daerah Administrasi!",
+                        data: res.data.data
+                    });
+                } else {
+                    $('.korwil').select2({
+                        placeholder: "Tidak ada data daerah yang terdaftar di organisasi!"
+                    });
+                }
+            });
+        }
+        $('.korda').on('change.select2', function(e) {
+            kordaparams['region_id'] = this.value;
             // additional.korda = data.id;
-            console.log(kordaparams);
+            // console.log(kordaparams);
             getAreas(kordaparams).then((res) => {
                 if (res.data.data.length > 0) {
                     $('.korwil').select2({
