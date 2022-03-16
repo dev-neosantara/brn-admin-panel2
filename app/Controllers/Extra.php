@@ -49,11 +49,19 @@ class Extra extends ResourceController
         $term = $this->request->getVar('term');
         $is_registered = $this->request->getVar('is_registered');
         // $page = $this->request->getVar('page');
+        $from_id = $this->request->getVar('area_id');
+        $area_id = null;
+        if($from_id != null){
+            $x = $this->db->table('areas')->where('id', $from_id)->get()->getRow();
+            $area_id = $x->region_id;
+        }
         $q = $this->db->table('regions');
         $selected_id = $this->request->getVar('id');
+        
         if ($selected_id != null) {
             $q = $q->whereNotIn('id', [$selected_id]);
         }
+        
         if ($is_registered != null) {
             $q = $q->where('is_registered', $is_registered);
         }
@@ -70,8 +78,10 @@ class Extra extends ResourceController
         if (count($data) > 0) {
             $selected = array();
 
-            if ($selected_id != null) {
+            if ($selected_id != null && $area_id == null) {
                 $selected = $this->db->table('regions')->where('id', $selected_id)->get()->getRowArray();
+            }else if($area_id != null){
+                $selected = $this->db->table('regions')->where('id', $area_id)->get()->getRowArray();
             }
             // print_r($selected);exit;
             if (isset($selected['id'])) {
@@ -107,9 +117,13 @@ class Extra extends ResourceController
         $term = $this->request->getVar('term');
         $region_id = $this->request->getVar('region_id');
         $is_registered = $this->request->getVar('is_registered');
-
-        $q = $this->db->table('areas')->where('region_id', $region_id);
+        // $getareas = $this->request->getVar('get_areas');
         $selected_id = $this->request->getVar('id');
+        if($selected_id != null && $region_id == null){
+            $region_id = $this->db->table('areas')->where('id', $selected_id)->get()->getRow()->region_id;
+        }
+        $q = $this->db->table('areas')->where('region_id', $region_id);
+        
         if ($selected_id != null) {
             $q = $q->whereNotIn('id', [$selected_id]);
         }

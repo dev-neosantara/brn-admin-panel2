@@ -42,6 +42,25 @@ class EventsController extends \App\Controllers\BaseAdmin
         echo view('Brn\Views\events\form', $data);
     }
 
+    public function delete($id)
+    {
+        $db = \Config\Database::connect();
+        try {
+            
+
+            if ($db->table('agendas')->where('id', $id)->delete()) {
+                echo json_encode(['error' => 0, 'message' => 'Berhasil menghapus data!']);
+                exit;
+            }
+
+            echo json_encode(['error' => 1, 'message' => 'Gagal menghapus data!']);
+            exit;
+        } catch (\Throwable $th) {
+            echo json_encode(['error' => 0, 'message' => 'Terjadi kesalahan! ', 'error_detail' => $db->error()]);
+            exit;
+        }
+    }
+
     public function listajax($cat_id = null)
     {
         $db = \Config\Database::connect();

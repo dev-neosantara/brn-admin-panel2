@@ -10,12 +10,12 @@
 <div class="card shadow mb-4">
     <div class="card-header py-3">
         <div class="flex items-center space-x-4">
-            <a href="<?= base_url('sponsors') ?>" class="flex items-center mr-md-4">
+            <a href="<?= base_url('events') ?>" class="flex items-center mr-md-4">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>&nbspKembali
             </a>
-            <h6 class="m-0 font-weight-bold text-primary">Tambah Data Sponsor</h6>
+            <h6 class="m-0 font-weight-bold text-primary">Tambah Data events</h6>
         </div>
     </div>
     <div class="card-body">
@@ -108,7 +108,7 @@
                         <div class="custom-control custom-checkbox small">
                             <input type="checkbox" class="custom-control-input" id="active" <?php //echo isset($data) && (int)$data->active == 1 ? "checked" : '' 
                                                                                             ?>>
-                            <label class="custom-control-label" for="active">Sponsor aktif? (jika iya, maka Sponsor akan terlihat di aplikasi)</label>
+                            <label class="custom-control-label" for="active">events aktif? (jika iya, maka events akan terlihat di aplikasi)</label>
                         </div>
                     </div>
                 </div> -->
@@ -131,17 +131,25 @@
 <script src="https://unpkg.com/leaflet-geosearch@3.0.0/dist/geosearch.umd.js"></script>
 <!-- <script src="https://cdn.ckeditor.com/4.17.1/standard-all/ckeditor.js"></script> -->
 <!-- <script src="<?= base_url() ?>/lib/ckeditor/ckeditor.js"></script> -->
+
 <script>
-    const dataevent = <?= isset($data) ? json_encode($data) : null ?>;
-    var lng = <?= isset($data) && $data->latitude != "" && $data->latitude != null ? $data->latitude : 108.495 ?>;
-    var lat = <?= isset($data) && $data->longitude != "" && $data->longitude != null ? $data->longitude : -6.888 ?>;
+    <?php if (isset($data)) { ?>
+        const dataevent = <?= json_encode($data) ?>;
+    <?php } else { ?>
+        var dataevent;
+    <?php } ?>
+</script>
+<script>
+    // custom script for map
+    var lat = dataevent != null && dataevent.latitude != null ? dataevent.latitude : 108.495;
+    var lng = dataevent != null && dataevent.longitude != null ? dataevent.longitude : -6.888;
     var map = L.map('map').setView([lng, lat], 8);
     var marker = new L.Marker(map.getCenter());
-
-
     marker.addTo(map);
+    // var osmGeocoder = new L.Control.OSMGeocoder();
+
     map.on('moveend', function(e) {
-        marker.bindTooltip("Lokasi Event").openTooltip();
+        marker.bindTooltip("Set ini sebagai alamat agenda").openTooltip();
         // console.log();
         var res = map.getCenter();
         lat = res.lat;
@@ -151,90 +159,208 @@
     map.on('move', function() {
         marker.setLatLng(map.getCenter());
     })
+    map.on('locationfound', function() {
+        marker.setLatLng(map.getCenter());
+    })
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors</a>'
     }).addTo(map);
+</script>
+<!-- Geocoding maps -->
+<script>
+    // geocoding maps
+    // minimal configure
+    new Autocomplete("search", {
+        // default selects the first item in
+        // the list of results
+        selectFirst: true,
 
-    // const search = new GeoSearch.GeoSearchControl({
-    //     provider: new GeoSearch.OpenStreetMapProvider(),
-    // });
-    // map.addControl(search);
-    map.on('click', mapClick);
+        // The number of characters entered should start searching
+        howManyCharacters: 2,
 
-    function mapClick(e) {
-        console.log(e.latlng.lat);
-        L.marker([10.496093, -66.881935]).addTo(map)
-    }
-    $('#prov').select2({
-        placeholder: 'Pilih ',
-        ajax: {
-            url: "<?= base_url('extra/get_regions') ?>",
-            dataType: 'json',
-            data: function(params) {
-                var query = {
-                    search: params.term,
-                    page: params.page || 1
-                }
+        // onSearch
+        onSearch: ({
+            currentValue
+        }) => {
+            // You can also use static files
+            // const api = '../static/search.json'
+            const api = `https://nominatim.openstreetmap.org/search?format=geojson&limit=5&city=${encodeURI(
+      currentValue
+    )}`;
 
-                // Query parameters will be ?search=[term]&page=[page]
-                return query;
-            },
-            processResults: function(data, params) {
-                var dt = $.map(data.data, function(obj) {
-                    obj.id = obj.id || obj.pk; // replace pk with your identifier
-                    obj.text = obj.text || obj.region;
-                    return obj;
-                });
-                // Transforms the top-level key of the response object from 'items' to 'results'
-                return {
-                    results: dt,
-                    pagination: {
-                        more: (params.page * 10) < data.count_filtered
-                    }
-                };
-            }
-            // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
-        }
-    });
+            /**
+             * jquery
+             */
+            // return $.ajax({
+            //     url: api,
+            //     method: 'GET',
+            //   })
+            //   .done(function (data) {
+            //     return data
+            //   })
+            //   .fail(function (xhr) {
+            //     console.error(xhr);
+            //   });
 
-    $('#prov').on('select2:select', function(e) {
-        var data = e.params.data;
-        $('#city').select2({
-            ajax: {
-                url: "<?= base_url('extra/get_areas') ?>/" + data.id,
-                dataType: 'json',
-                data: function(params) {
-                    var query = {
-                        search: params.term,
-                        page: params.page || 1
-                    }
+            // OR -------------------------------
 
-                    // Query parameters will be ?search=[term]&page=[page]
-                    return query;
-                },
-                processResults: function(data, params) {
-                    var dt = $.map(data.data, function(obj) {
-                        obj.id = obj.id || obj.pk; // replace pk with your identifier
-                        obj.text = obj.text || obj.area;
-                        return obj;
+            /**
+             * axios
+             * If you want to use axios you have to add the
+             * axios library to head html
+             * https://cdnjs.com/libraries/axios
+             */
+            // return axios.get(api)
+            //   .then((response) => {
+            //     return response.data;
+            //   })
+            //   .catch(error => {
+            //     console.log(error);
+            //   });
+
+            // OR -------------------------------
+
+            /**
+             * Promise
+             */
+            return new Promise((resolve) => {
+                fetch(api)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        resolve(data.features);
+                    })
+                    .catch((error) => {
+                        console.error(error);
                     });
-                    // Transforms the top-level key of the response object from 'items' to 'results'
-                    return {
-                        results: dt,
-                        pagination: {
-                            more: (params.page * 10) < data.count_filtered
-                        }
-                    };
+            });
+        },
+        // nominatim GeoJSON format parse this part turns json into the list of
+        // records that appears when you type.
+        onResults: ({
+            currentValue,
+            matches,
+            template
+        }) => {
+            const regex = new RegExp(currentValue, "gi");
+
+            // if the result returns 0 we
+            // show the no results element
+            return matches === 0 ?
+                template :
+                matches
+                .map((element) => {
+                    return `
+          <li class="loupe">
+            <p>
+              ${element.properties.display_name.replace(
+                regex,
+                (str) => `<b>${str}</b>`
+              )}
+            </p>
+          </li> `;
+                })
+                .join("");
+        },
+
+        // we add an action to enter or click
+        onSubmit: ({
+            object
+        }) => {
+            const {
+                display_name
+            } = object.properties;
+            const cord = object.geometry.coordinates;
+
+            // custom id for marker
+            const customId = Math.random();
+
+            // create marker and add to map
+            marker = L.marker([cord[1], cord[0]], {
+                    title: display_name,
+                    id: customId,
+                })
+                .addTo(map)
+                .bindPopup(display_name);
+
+            // sets the view of the map
+            map.setView([cord[1], cord[0]], 8);
+
+            let res = map.getCenter();
+
+            lat = res.lat;
+            lng = res.lng;
+
+            // removing the previous marker
+            // if you want to leave markers on
+            // the map, remove the code below
+            map.eachLayer(function(layer) {
+                if (layer.options && layer.options.pane === "markerPane") {
+                    if (layer.options.id !== customId) {
+                        map.removeLayer(layer);
+                    }
                 }
-                // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
-            }
-        });
+            });
+        },
+
+        // get index and data from li element after
+        // hovering over li with the mouse or using
+        // arrow keys ↓ | ↑
+        onSelectedItem: ({
+            index,
+            element,
+            object
+        }) => {
+            // console.log("onSelectedItem:", index, element, object);
+        },
+
+        // the method presents no results element
+        noResults: ({
+                currentValue,
+                template
+            }) =>
+            template(`<li>No results found: "${currentValue}"</li>`),
     });
-    if (dataevent != null && dataevent.korwil_id != null) {
-        var defaultProv = new Option(datauser.korwil_name, datauser.korwil_id, true, false);
-        $('#prov').append(defaultKorwil).trigger('change');
-    }
+</script>
+<script>
+    var provparams = {};
+    var cityparams = {};
+    $(document).ready(() => {
+        if (dataevent != null && dataevent.area_id != null) {
+            provparams['area_id'] = dataevent.area_id;
+            cityparams['id'] = dataevent.area_id;
+            getAreas(cityparams).then((res) => {
+                $('#city').select2({
+                    placeholder: 'Pilih Kota!',
+                    data: res.data.data
+                });
+            });
+        }
+        getRegions(provparams).then((res) => {
+                $('#prov').select2({
+                    placeholder: 'Pilih provinsi!',
+                    data: res.data.data
+                });
+            });
+
+            
+        $('#prov').on('change.select2', function(e) {
+            // var data = e.params.data;
+            cityparams['region_id'] = this.value;
+            getAreas(cityparams).then((res) => {
+                $('#city').select2({
+                    placeholder: 'Pilih Kota!',
+                    data: res.data.data
+                });
+            });
+            
+        });
+    })
+
+    // if (dataevent != null && dataevent.korwil_id != null) {
+    //     var defaultProv = new Option(datauser.korwil_name, datauser.korwil_id, true, false);
+    //     $('#prov').append(defaultKorwil).trigger('change');
+    // }
 </script>
 <script>
     var image = "";
@@ -309,7 +435,7 @@
             image: $('input[type=file]').get(0).files[0],
             data_id: null
         };
-        
+
         <?php if (isset($data_id) && $data_id != null) { ?>
             params['data_id'] = <?= $data_id ?>;
         <?php } ?>
@@ -351,8 +477,8 @@
                 icon: 'success',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Kembali ke halaman Sponsor',
-                cancelButtonText: "Tambah sponsor lainnya"
+                confirmButtonText: 'Kembali ke halaman Agenda',
+                cancelButtonText: "Tambah agenda lainnya"
             }).then((result) => {
                 if (result.isConfirmed) {
                     window.history.back();
@@ -376,7 +502,7 @@
         if ($('#title').val() == '') {
             Swal.fire(
                 'Perhatian!',
-                'Nama Sponsor/Perusahaan Tidak boleh kosong!',
+                'Nama events/Perusahaan Tidak boleh kosong!',
                 'error'
             );
             return false;
