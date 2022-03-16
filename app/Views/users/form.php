@@ -66,7 +66,7 @@
                                 <div class="form-group">
                                     <label for="date_of_birth">Tgl Lahir</label>
                                     <div class="input-group date tgllahir" data-provide="datepicker">
-                                        <input type="text" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="01/01/2001">
+                                        <input type="text" class="form-control" name="date_of_birth" id="date_of_birth" placeholder="01/01/2001" value="<?php echo isset($data) && property_exists($data, 'date_of_birth') ? $data->date_of_birth : '' ?>">
                                         <div class="input-group-addon">
                                             <span class="glyphicon glyphicon-th"></span>
                                         </div>
@@ -185,7 +185,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="postal_code">Alamat Lengkap</label>
-                                    <textarea name="address" id="address" cols="30" rows="10" class="form-control form-control-user"></textarea>
+                                    <textarea name="address" id="address" cols="30" rows="10" class="form-control form-control-user"><?= isset($data) && property_exists($data, 'address') ? $data->address : "" ?></textarea>
                                 </div>
                             </div>
                             <div class="col-md-12">
@@ -544,7 +544,7 @@
                 }
             });
         }
-        $('.prov').on('change.select2', function(e) {
+        $('.prov').on('change.select2, select2:select', function(e) {
             cityparams['region_id'] = this.value;
             getAreas(cityparams).then((res) => {
                 if (res.data.data.length > 0) {
@@ -559,7 +559,7 @@
                 }
             });
         });
-        $('.city').on('change.select2', function(e) {
+        $('.city').on('change.select2, select2:select', function(e) {
             subdsparams['area_id'] = this.value;
             getSubdistrict(subdsparams).then((res) => {
                 if (res.data.data.length > 0) {
@@ -616,7 +616,7 @@
                 }
             });
         }
-        $('.korda').on('change.select2', function(e) {
+        $('.korda').on('change.select2, select2:select', function(e) {
             kordaparams['region_id'] = this.value;
             // additional.korda = data.id;
             // console.log(kordaparams);
@@ -695,6 +695,7 @@
             return;
         }
         var params = $('#formuser').serializeArray();
+        console.log(params['role']);
         var db = new Date(tgllahir.datepicker('getDate'));
         additional.phone = phone.getRawValue();
         additional.korda = document.querySelector("#korwil").value;
@@ -708,13 +709,6 @@
             params['profile_photo_path'] = image;
             params['profile_image'] = image;
         }
-        <?php if (isset($role)) { ?>
-            if(params.hasOwnProperty('role')){
-                params['role'] = params['role'] != null ? params['role'] : role;
-            }
-            additional['role'] = role
-            
-        <?php } ?>
         <?php if (isset($data_id)) { ?>
             additional['data_id'] = '<?= $data_id ?>'
         <?php } ?>
@@ -723,9 +717,10 @@
             obj[item.name] = item.value;
             return obj;
         }, {});
+
         params = {
-            ...params,
-            ...additional
+            ...additional,
+            ...params
         };
         // console.log();return;
         var urls = "<?= base_url('/users/tambah') ?>";

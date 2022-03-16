@@ -4,13 +4,9 @@ namespace Brn\Controllers;
 
 
 use \Hermawan\DataTables\DataTable;
-// use Endroid\QrCode\QrCode;
-// use Endroid\QrCode\Writer\PngWriter;
-use \chillerlan\QRCode\QRCode;
-use \chillerlan\QRCode\QROptions;
 
 
-class EventsController extends \App\Controllers\BaseAdmin
+class RegionsController extends \App\Controllers\BaseAdmin
 {
     protected $upload_path;
     public function __construct()
@@ -21,7 +17,9 @@ class EventsController extends \App\Controllers\BaseAdmin
 
     public function index()
     {
-        echo view('Brn\Views\events\list');
+        $region_id = $this->request->getVar('region');
+        $area_id = $this->request->getVar('area');
+        echo view('Brn\Views\regional\list');
     }
 
     public function form($id = null)
@@ -161,58 +159,4 @@ class EventsController extends \App\Controllers\BaseAdmin
         echo json_encode(['error' => 1, 'message' => 'Gagal menambahkan data agenda!']);exit;
     }
 
-    private function generateqr($id, $update = true)
-    {
-        // $id = $this->request->getVar('id');
-        try {
-            $db      = \Config\Database::connect();
-            $current = $db->table('agendas')->where('id', $id)->get()->getResult();
-            
-            // $options = new QROptions([
-            //     'version'    => 5,
-            //     'outputType' => QRCode::OUTPUT_MARKUP_SVG,
-            //     'eccLevel'   => QRCode::ECC_L,
-            // ]);
-
-            $filename = "/uploads/agenda/agendaQr_".time()."_".$id.".png";
-            
-            if((new QRCode)->render("https://api.brnjuara.com/api/agendas/".$id."/qr-scan", ROOTPATH . "public" . $filename)){
-                $db->table('agendas')->where('id', $id)->set('qr_path', base_url($filename))->update();
-                if(count($current) > 0){
-                    if($current[0]->qr_path != ""){
-                        $url = parse_url($current[0]->qr_path);
-                        // print_r($url);exit;
-                        if (file_exists(ROOTPATH . "public" . $url['path'])) {
-                            unlink(ROOTPATH . "public" . $url['path']);
-                         }
-                    }
-                   
-                }
-                return $filename;
-            }
-            return "";
-        } catch (\Throwable $th) {
-            print_r($th);exit;
-        }
-       
-    }
-
-    public function get_generateqr()
-    {
-        $id = $this->request->getVar('id');
-        $qrpath = $this->generateqr($id);
-        if($qrpath == ""){
-            echo json_encode(['error' => 1, 'message' => 'Gagal mendapatkan qr!']);exit;
-        }
-        echo json_encode(['error' => 0, 'message' => 'OK!', 'data' => base_url($qrpath)]);exit;
-    }
-
-    public function invitation()
-    {
-        $id = $this->request->getVar('id');
-        $db      = \Config\Database::connect();
-        $data['data'] = $db->table('agendas')->where('id', $id)->get()->getRow();
-
-        echo view('Brn\Views\events\invitation', $data);
-    }
 }
